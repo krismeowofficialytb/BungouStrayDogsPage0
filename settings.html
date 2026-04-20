@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settings</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+
+<style>
+body {
+  margin:0;
+  font-family:'Rajdhani',sans-serif;
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background: radial-gradient(circle at top, #1a0b0b, #0a0608);
+  color:#ffe6e6;
+  overflow:hidden;
+}
+
+/* GLITCH BACKGROUND */
+.bg::before {
+  content:"";
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(circle at 30% 20%, rgba(255,80,80,0.15), transparent 50%),
+    radial-gradient(circle at 70% 80%, rgba(255,120,120,0.08), transparent 60%);
+  animation: float 6s infinite ease-in-out;
+}
+
+@keyframes float {
+  0%,100% { transform:translateY(0); }
+  50% { transform:translateY(-10px); }
+}
+
+/* PANEL */
+.panel {
+  width:420px;
+  background: rgba(30,10,10,0.75);
+  border:1px solid rgba(255,100,100,0.25);
+  border-radius:18px;
+  padding:22px;
+  backdrop-filter: blur(10px);
+  box-shadow:0 0 40px rgba(255,0,0,0.08);
+  position:relative;
+}
+
+/* subtle glitch title */
+.title {
+  text-align:center;
+  font-size:18px;
+  letter-spacing:5px;
+  position:relative;
+}
+
+.title::before,
+.title::after {
+  content:"SETTINGS";
+  position:absolute;
+  left:0;
+  width:100%;
+  opacity:0.2;
+}
+
+.title::before {
+  color:#ff3b3b;
+  animation: glitch1 2.5s infinite;
+}
+
+.title::after {
+  color:#ff9a9a;
+  animation: glitch2 2.5s infinite;
+}
+
+@keyframes glitch1 {
+  0%,100% { transform:translate(0); }
+  20% { transform:translate(-2px,1px); }
+  40% { transform:translate(2px,-1px); }
+}
+
+@keyframes glitch2 {
+  0%,100% { transform:translate(0); }
+  25% { transform:translate(2px,0); }
+  50% { transform:translate(-2px,1px); }
+}
+
+/* BACK */
+.back {
+  position:absolute;
+  top:14px;
+  left:14px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  cursor:pointer;
+  opacity:0.7;
+  transition:0.2s;
+}
+
+.back:hover {
+  opacity:1;
+  transform:translateX(-3px);
+}
+
+/* BLOCKS */
+.block {
+  margin-top:18px;
+  padding:14px;
+  border-radius:14px;
+  background: rgba(255,255,255,0.03);
+  border:1px solid rgba(255,80,80,0.12);
+}
+
+/* AUDIO */
+.audio {
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.iconBtn {
+  width:42px;
+  height:42px;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  border-radius:12px;
+  background: rgba(255,80,80,0.15);
+  border:1px solid rgba(255,100,100,0.2);
+  cursor:pointer;
+  transition:0.2s;
+}
+
+.iconBtn:hover {
+  transform:scale(1.1);
+  background: rgba(255,80,80,0.25);
+}
+
+input[type="range"] {
+  flex:1;
+}
+
+/* BUTTONS */
+button {
+  width:100%;
+  margin-top:10px;
+  padding:10px;
+  border-radius:12px;
+  border:none;
+  cursor:pointer;
+  background: rgba(255,80,80,0.15);
+  color:#ffe6e6;
+  transition:0.2s;
+}
+
+button:hover {
+  background: rgba(255,80,80,0.3);
+  transform:scale(1.02);
+}
+
+.danger {
+  background: rgba(255,50,50,0.25);
+}
+
+.danger:hover {
+  background: rgba(255,50,50,0.4);
+}
+</style>
+</head>
+
+<body>
+
+<div class="bg"></div>
+
+<div class="panel">
+
+<!-- BACK -->
+<div class="back" onclick="goBack()">
+  <i data-lucide="arrow-left"></i>
+  <span>Back</span>
+</div>
+
+<div class="title">SETTINGS</div>
+
+<!-- AUDIO -->
+<div class="block">
+  <div class="audio">
+
+    <div class="iconBtn" id="muteBtn">
+      <i data-lucide="volume-2" id="icon"></i>
+    </div>
+
+    <input id="volume" type="range" min="0" max="100">
+  </div>
+</div>
+
+<!-- SAVE -->
+<div class="block">
+  <button onclick="exportSave()">Export Save</button>
+  <button onclick="importSave()">Import Save</button>
+</div>
+
+<!-- RESET -->
+<div class="block">
+  <button class="danger" onclick="resetAll()">Reset Game Data</button>
+</div>
+
+</div>
+
+<script>
+lucide.createIcons();
+
+/* ================= AUDIO ================= */
+const music = new Audio("music/menu.mp3");
+music.loop = true;
+
+let volume = parseFloat(localStorage.getItem("volume") ?? 0.5);
+let muted = localStorage.getItem("mute") === "true";
+
+music.volume = volume;
+music.muted = muted;
+music.play().catch(()=>{});
+
+const slider = document.getElementById("volume");
+const icon = document.getElementById("icon");
+
+slider.value = volume * 100;
+
+/* volume */
+slider.oninput = () => {
+  music.volume = slider.value / 100;
+  localStorage.setItem("volume", music.volume);
+};
+
+/* mute toggle */
+document.getElementById("muteBtn").onclick = () => {
+  music.muted = !music.muted;
+  localStorage.setItem("mute", music.muted);
+  updateIcon();
+};
+
+function updateIcon() {
+  icon.setAttribute(
+    "data-lucide",
+    music.muted ? "volume-x" : "volume-2"
+  );
+  lucide.createIcons();
+}
+updateIcon();
+
+/* ================= SAVE ================= */
+function exportSave() {
+  const data = {};
+  for (let i = 0; i < localStorage.length; i++) {
+    let k = localStorage.key(i);
+    data[k] = localStorage.getItem(k);
+  }
+
+  const blob = new Blob([JSON.stringify(data, null, 2)], {
+    type:"application/json"
+  });
+
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "save.json";
+  a.click();
+}
+
+/* simple import */
+function importSave() {
+  const input = document.createElement("input");
+  input.type = "file";
+
+  input.onchange = e => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      try {
+        const data = JSON.parse(reader.result);
+        Object.keys(data).forEach(k => localStorage.setItem(k, data[k]));
+        alert("Imported!");
+      } catch {
+        alert("Invalid file");
+      }
+    };
+
+    reader.readAsText(file);
+  };
+
+  input.click();
+}
+
+/* RESET */
+function resetAll() {
+  if (!confirm("Reset everything?")) return;
+
+  localStorage.clear();
+  sessionStorage.clear();
+  window.location.href = "index.html";
+}
+
+/* BACK */
+function goBack() {
+  window.location.href = "index.html";
+}
+</script>
+
+</body>
+</html>
