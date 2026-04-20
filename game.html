@@ -29,7 +29,11 @@ body {
 .overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(10,6,8,0.9), rgba(10,6,8,0.3));
+  background: radial-gradient(
+    circle at bottom,
+    rgba(0,0,0,0.25),
+    transparent 60%
+  );
 }
 
 .textbox {
@@ -62,6 +66,9 @@ body {
   color: #fff;
   padding: 10px;
   border-radius: 10px;
+}
+#intro {
+  display: none;
 }
 
 .topbar {
@@ -185,25 +192,53 @@ function renderChoices(scene) {
   const box = document.getElementById("choices");
   box.innerHTML = "";
 
-  if (!scene.choices || scene.choices.length === 0) {
-    box.innerHTML = `<button class="next-btn" onclick="nextScene()">Next ➜</button>`;
-    return;
+  const nav = document.createElement("div");
+  nav.style.display = "flex";
+  nav.style.gap = "10px";
+
+  // PREVIOUS
+  const prev = document.createElement("button");
+  prev.textContent = "⬅ Prev";
+  prev.className = "choice-btn";
+  prev.onclick = prevScene;
+
+  // NEXT
+  const next = document.createElement("button");
+  next.textContent = "Next ➜";
+  next.className = "next-btn";
+  next.onclick = nextScene;
+
+  nav.appendChild(prev);
+  nav.appendChild(next);
+
+  box.appendChild(nav);
+
+  // choices si existants
+  if (scene.choices && scene.choices.length > 0) {
+    scene.choices.forEach(c => {
+      const btn = document.createElement("button");
+      btn.textContent = c.label;
+      btn.className = "choice-btn";
+      btn.onclick = nextScene;
+      box.appendChild(btn);
+    });
   }
-
-  scene.choices.forEach(c => {
-    const btn = document.createElement("button");
-    btn.textContent = c.label;
-    btn.className = "choice-btn";
-    btn.onclick = nextScene;
-    box.appendChild(btn);
-  });
 }
-
+function prevScene() {
+  if (currentScene > 0) {
+    currentScene--;
+    showScene();
+  }
+}
 function goMenu() {
+  // retour SANS reloading intro
   window.location.href = "index.html";
+
+  sessionStorage.setItem("introDone", "true");
 }
 
 window.onload = loadGame;
+
 </script>
 
 </body>

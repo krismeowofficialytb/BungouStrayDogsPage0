@@ -133,6 +133,14 @@
 0%,100% { transform: scale(1); opacity:1; }
 50% { transform: scale(1.05); opacity:0.7; }
 }
+
+#menu {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100%;
+}
+
     .title-glitch {
       animation: glitchText 4s infinite;
     }
@@ -209,8 +217,6 @@
     .flicker { animation: flicker 5s infinite; }
   </style>
   <style>body { box-sizing: border-box; }</style>
-  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
-  <script src="/_sdk/element_sdk.js" type="text/javascript"></script>
  </head>
  <body class="h-full">
 
@@ -283,7 +289,7 @@ ENTER
 
 
   <audio id="menuMusic"></audio>
-  <div id="app" class="relative w-full h-full overflow-hidden scanline-overlay" style="background: #0a0608;">
+<div id="menu" class="relative w-full h-full overflow-hidden scanline-overlay" style="background: #0a0608;">
    <!-- Background image layers --> <picture id="bg-picture">
     <source media="(max-width: 768px)" srcset="images/menuwallpaper.png, images/menuwallpaperformobilewidth.png, images/menuwallpaperformobilewidth.jpg" type="image/webp">
     <source media="(max-width: 768px)" srcset="images/menuwallpaper.png, images/menuwallpaperformobilewidth.jpg" type="image/png">
@@ -321,6 +327,38 @@ style="font-family:'Rajdhani',sans-serif; background: rgba(60,20,20,0.6); transi
    </div>
   </div>
   <script>
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  const intro = document.getElementById("intro");
+  const menu = document.getElementById("menu");
+  const btn = document.getElementById("startBtn");
+
+  console.log("intro =", intro);
+  console.log("menu =", menu);
+
+  // ÉTAT INITIAL
+  intro.style.display = "flex";
+  
+
+  btn.addEventListener("click", () => {
+
+    console.log("START CLICK");
+
+    intro.style.display = "none";
+    menu.style.display = "flex";
+
+    sessionStorage.setItem("introDone", "true");
+  });
+
+  // si déjà joué
+  if (sessionStorage.getItem("introDone") === "true") {
+    intro.style.display = "none";
+    menu.style.display = "flex";
+  }
+
+});
+
     // Show admin button only on localhost
     if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
       document.getElementById('admin-container').style.display = 'flex';
@@ -351,20 +389,20 @@ style="font-family:'Rajdhani',sans-serif; background: rgba(60,20,20,0.6); transi
 
 document.addEventListener("DOMContentLoaded", () => {
 
-  // ===================== DOM =====================
   const intro = document.getElementById("intro");
+  const menu = document.getElementById("menu");
   const btn = document.getElementById("startBtn");
+
   const statusText = document.getElementById("statusText");
   const subText = document.getElementById("subText");
   const pressText = document.getElementById("pressText");
 
-  // ===================== AUDIO =====================
   const audio = document.getElementById("menuMusic");
+
   audio.src = "music/menu.mp3";
   audio.loop = true;
   audio.volume = 0.1;
 
-  // ===================== STATE =====================
   const steps = [
     ["Loading Otome Game", "initializing emotional core..."],
     ["Loading Otome Game", "building character routes..."],
@@ -374,11 +412,16 @@ document.addEventListener("DOMContentLoaded", () => {
   let i = 0;
   let phase = "loading";
 
-  // bouton caché au départ
+  // sécurité DOM
+  if (!intro || !menu || !btn) {
+    console.error("Elements manquants DOM");
+    return;
+  }
+
+  
   btn.style.opacity = "0";
   btn.style.pointerEvents = "none";
 
-  // ===================== LOADING =====================
   function runLoading() {
     const interval = setInterval(() => {
       const [title, sub] = steps[i];
@@ -395,13 +438,11 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 1200);
   }
 
-  // ===================== READY =====================
   function enterReady() {
     phase = "ready";
 
     statusText.textContent = "Bungou Stray Dogs: Page 0";
     subText.textContent = "";
-
     pressText.style.opacity = "1";
 
     btn.style.pointerEvents = "auto";
@@ -412,13 +453,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }, 100);
   }
 
-  // ===================== CLICK =====================
   btn.addEventListener("click", async () => {
     if (phase !== "ready") return;
 
-    phase = "exit";
-
-    intro.style.transition = "0.8s ease";
     intro.style.opacity = "0";
 
     try {
@@ -429,13 +466,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
     setTimeout(() => {
       intro.style.display = "none";
+      menu.style.display = "flex";
     }, 800);
   });
 
-  // ===================== START =====================
   runLoading();
 
 });
+
 function startGame() {
   window.location.href = "game.html";
 }
@@ -460,5 +498,7 @@ function loadGameMenu() {
     container.appendChild(btn);
   });
 }
+
+
  </script>
  </body>
