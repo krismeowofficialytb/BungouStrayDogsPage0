@@ -1,0 +1,115 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Admin VN</title>
+
+<script src="admin.js" defer></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+
+body {
+  margin:0;
+  background:#0a0608;
+  color:#e8d5c4;
+  font-family:Rajdhani;
+}
+
+/* layout */
+.app {
+  display:flex;
+  height:100vh;
+}
+
+/* sidebar */
+.sidebar {
+  width:250px;
+  background:rgba(20,5,5,0.6);
+  border-right:1px solid rgba(200,50,50,0.3);
+  padding:10px;
+}
+
+/* buttons */
+.btn {
+  width:100%;
+  padding:10px;
+  margin-bottom:8px;
+  background:rgba(60,15,15,0.3);
+  border:1px solid rgba(200,50,50,0.3);
+  color:#e8d5c4;
+  cursor:pointer;
+  border-radius:8px;
+}
+
+.btn:hover {
+  background:rgba(120,20,20,0.5);
+}
+
+/* main */
+.main {
+  flex:1;
+  padding:10px;
+  overflow:auto;
+}
+
+.card {
+  background:rgba(20,5,5,0.4);
+  border:1px solid rgba(200,50,50,0.2);
+  padding:10px;
+  margin-bottom:10px;
+  border-radius:10px;
+}
+
+input, textarea {
+  width:100%;
+  margin:5px 0;
+  padding:8px;
+  background:black;
+  border:1px solid rgba(200,50,50,0.3);
+  color:#e8d5c4;
+}
+
+h2 {
+  font-family:"Cinzel Decorative";
+}
+
+.save {
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  background:red;
+  padding:10px 20px;
+  border:none;
+  color:white;
+  cursor:pointer;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <h2>CHAPTERS</h2>
+  <div id="fileList"></div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+  <h2 id="title">No file</h2>
+  <div id="editor"></div>
+
+</div>
+
+</div>
+
+<button class="save" onclick="saveFile()">SAVE</button>
+
+</body>
+</html>

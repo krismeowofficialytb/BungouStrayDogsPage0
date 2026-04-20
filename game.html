@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Game</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+body {
+  margin: 0;
+  overflow: hidden;
+  font-family: 'Rajdhani', sans-serif;
+}
+
+#bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.5) contrast(1.1);
+  background: black;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(10,6,8,0.9), rgba(10,6,8,0.3));
+}
+
+.textbox {
+  background: rgba(20, 8, 10, 0.85);
+  border: 1px solid rgba(200, 60, 60, 0.4);
+  border-radius: 15px;
+  padding: 20px;
+  color: #e8d5c4;
+}
+
+#text {
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+.choice-btn {
+  background: rgba(60,15,15,0.6);
+  border: 1px solid rgba(200,60,60,0.4);
+  color: #e8d5c4;
+  padding: 12px;
+  border-radius: 10px;
+}
+
+.choice-btn:hover {
+  background: rgba(120,20,20,0.7);
+}
+
+.next-btn {
+  background: rgba(200,60,60,0.8);
+  color: #fff;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+.topbar {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+}
+
+.icon-btn {
+  background: rgba(20,8,10,0.7);
+  border: 1px solid rgba(200,60,60,0.4);
+  color: #e8d5c4;
+  padding: 6px 12px;
+  border-radius: 8px;
+}
+</style>
+</head>
+
+<body>
+
+<audio id="music"></audio>
+
+<img id="bg">
+
+<div class="overlay"></div>
+
+<div class="topbar">
+  <button class="icon-btn" onclick="goMenu()">← Menu</button>
+  <button class="icon-btn" onclick="saveGame()">Save</button>
+</div>
+
+<div class="absolute bottom-0 w-full p-4 flex justify-center">
+  <div class="w-full max-w-2xl space-y-4">
+    <div id="text" class="textbox"></div>
+    <div id="choices" class="flex flex-col gap-2"></div>
+  </div>
+</div>
+
+<script src="js/saveSystem.js"></script>
+
+<script>
+let data;
+let currentScene = 0;
+let currentChapter = 1;
+
+function typeWriter(text, el) {
+  el.textContent = "";
+  let i = 0;
+  const speed = 20;
+
+  function write() {
+    if (i < text.length) {
+      el.textContent += text[i++];
+      setTimeout(write, speed);
+    }
+  }
+  write();
+}
+
+async function loadGame() {
+
+  currentChapter = 1;
+  currentScene = 0;
+
+  const res = await fetch(`json/chapter${currentChapter}.json?nocache=` + Date.now());
+  data = await res.json();
+
+  showScene();
+}
+
+function showScene() {
+  const scene = data.scenes[currentScene];
+
+  typeWriter(scene.text, document.getElementById("text"));
+
+  // IMAGE FIX
+  const bg = document.getElementById("bg");
+  const imgPath = scene.background;
+
+  bg.src = imgPath;
+
+  bg.onerror = () => {
+    console.log("Image introuvable :", imgPath);
+  };
+
+  // MUSIC FIX
+  const music = document.getElementById("music");
+
+  if (scene.music) {
+    const musicPath = scene.music;
+
+    if (!music.src.includes(musicPath)) {
+      music.src = musicPath;
+      music.loop = true;
+      music.volume = 0.5;
+
+      music.play().catch(e => {
+        console.log("Audio bloqué:", e);
+      });
+    }
+  }
+
+  renderChoices(scene);
+}
+
+function nextScene() {
+  currentScene++;
+
+  if (currentScene >= data.scenes.length) {
+    alert("Chapitre terminé !");
+    return;
+  }
+
+  showScene();
+}
+
+function renderChoices(scene) {
+  const box = document.getElementById("choices");
+  box.innerHTML = "";
+
+  if (!scene.choices || scene.choices.length === 0) {
+    box.innerHTML = `<button class="next-btn" onclick="nextScene()">Next ➜</button>`;
+    return;
+  }
+
+  scene.choices.forEach(c => {
+    const btn = document.createElement("button");
+    btn.textContent = c.label;
+    btn.className = "choice-btn";
+    btn.onclick = nextScene;
+    box.appendChild(btn);
+  });
+}
+
+function goMenu() {
+  window.location.href = "index.html";
+}
+
+window.onload = loadGame;
+</script>
+
+</body>
+</html>
