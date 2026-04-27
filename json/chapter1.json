@@ -52,7 +52,7 @@
     {
       "id": "c1_s05",
       "chapter": 1,
-      "background": "agency_cafeteria_morning.jpg",
+     "background": "cafetaria.png",
       "character": "null",
        "speaker": "Atsushi",
       "text": "Bonjour Dazai-san.",
@@ -63,7 +63,7 @@
     {
       "id": "c1_s06",
       "chapter": 1,
-      "background": "agency_cafeteria_morning.jpg",
+      "background": "cafetaria.png",
       "character": "dazaicasual3.png",
       "speaker": "Dazai",
       "text": "Bonjour Atsushi-kun. Tu es ponctuel, ce matin.",
@@ -74,7 +74,7 @@
     {
       "id": "c1_s07",
       "chapter": 1,
-      "background": "agency_cafeteria_morning.jpg",
+      "background": "cafetaria.png",
       "character": "lucy.smile.png",
       "speaker": null,
       "text": "Lucy sort de la cuisine, un torchon à la main. Elle s'approche de notre table d'un pas pressé, l'air impatient.",
@@ -96,7 +96,7 @@
     {
       "id": "c1_s09",
       "chapter": 1,
-      "background": "agency_cafeteria_morning.jpg",
+      "background": "cafetaria.png",
       "character": "lucysmile.png",
       "speaker": "Atsushi",
       "text": "Bonjour Lucy. Juste un café, merci.",
@@ -141,7 +141,7 @@
     {
       "id": "c1_s14",
       "chapter": 1,
-      "background": "agency_cafeteria_morning.jpg",
+      "background": "cafetaria.png",
       "character": "dazaicasual1.png",
       "speaker": "Dazai",
       "text": "Avoue que tu restes surtout pour voir Atsushi tous les jours.",
@@ -152,7 +152,7 @@
     {
       "id": "c1_s15",
       "chapter": 1,
-      "background": "agency_cafeteria_morning.jpg",
+     "background": "cafetaria.png",
       "character": "lucyflush.png",
       "speaker": "Lucy",
       "text": "Même pas en rêve !",
@@ -163,7 +163,7 @@
     {
       "id": "c1_s16",
       "chapter": 1,
-      "background": "agency_cafeteria_morning.jpg",
+     "background": "cafetaria.png",
       "character": null,
       "speaker": null,
       "text": "Elle tourne les talons et disparaît dans la cuisine en claquant la porte derrière elle.",
@@ -174,7 +174,7 @@
     {
       "id": "c1_s17",
       "chapter": 1,
-      "background": "agency_cafeteria_morning.jpg",
+      "background": "cafetaria.png",
       "character": null,
       "speaker": null,
       "text": "Je reste un instant silencieux, un peu perdu. Puis je me tourne vers la fenêtre.",
@@ -185,7 +185,7 @@
     {
       "id": "c1_s18",
       "chapter": 1,
-      "background": "agency_cafeteria_morning.jpg",
+      "background": "cafetaria.png",
       "character": "atsushi_casual.png",
       "speaker": "Atsushi",
       "text": "Tout est si calme ces derniers temps. Je me demande si ça va durer.",
@@ -196,7 +196,7 @@
     {
       "id": "c1_s19",
       "chapter": 1,
-      "background": "agency_cafeteria_morning.jpg",
+      "background": "cafetaria.png",
       "character": "dazaicasual2.png",
       "speaker": "Dazai",
       "text": "Le calme, c’est comme une corde. On la tire, on la tire… et un jour, elle casse. La question, c’est de savoir qui tient l’autre bout.",
@@ -207,7 +207,7 @@
     {
       "id": "c1_s20",
       "chapter": 1,
-      "background": "agency_cafeteria_morning.jpg",
+      "background": "cafetaria.png",
       "character": null,
       "speaker": null,
       "text": "Je n'ai pas le temps de répondre. La porte de la rue s'ouvre. Kunikida entre, costume impeccable, carnet à la main, les traits tirés.",
@@ -218,7 +218,7 @@
     {
       "id": "c1_s21",
       "chapter": 1,
-      "background": "agency_cafeteria_morning.jpg",
+     "background": "cafetaria.png",
       "character": "kunikida_working.png",
       "speaker": "Kunikida",
       "text": "Nakajima. Dazai. Réunion dans vingt minutes. Salle principale.",
@@ -229,7 +229,7 @@
     {
       "id": "c1_s22",
       "chapter": 1,
-      "background": "agency_cafeteria_morning.jpg",
+      "background": "cafetaria.png",
       "character": "atsushi_casual.png",
       "speaker": "Moi",
       "text": "Il s'est passé quelque chose ?",
@@ -240,7 +240,7 @@
     {
       "id": "c1_s23",
       "chapter": 1,
-      "background": "agency_cafeteria_morning.jpg",
+      "background": "cafetaria.png",
       "character": "kunikida_working.png",
       "speaker": "Kunikida",
       "text": "Je vous expliquerai là-haut. Dépêchez-vous.",
@@ -251,7 +251,7 @@
     {
       "id": "c1_s24",
       "chapter": 1,
-      "background": "agency_cafeteria_morning.jpg",
+     "background": "cafetaria.png",
       "character": null,
       "speaker": null,
       "text": "Il ressort aussi sec. Dazai se lève, attrape sa veste.",
@@ -262,7 +262,7 @@
     {
       "id": "c1_s25",
       "chapter": 1,
-      "background": "agency_cafeteria_morning.jpg",
+      "background": "cafetaria.png",
       "character": "dazai_casual.png",
       "speaker": "Dazai",
       "text": "On y va, Atsushi-kun.",
@@ -273,7 +273,7 @@
     {
       "id": "c1_s26",
       "chapter": 1,
-      "background": "agency_cafeteria_morning.jpg",
+      "background": "cafetaria.png",
       "character": null,
       "speaker": null,
       "text": "Je bois ma dernière gorgée de café et me lève à mon tour.",
