@@ -5,27 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Bungou Stray Dogs - Page 0</title>
   <script src="https://cdn.tailwindcss.com"></script>
- <script>
+  <script>
     window.gMute = (typeof window.gMute !== 'undefined') ? window.gMute : false;
     window.gVol  = (typeof window.gVol !== 'undefined') ? window.gVol : 0.5;
   </script>
-
-  <!-- Chargement de global.js (il pourra écraser gMute/gVol) -->
   <script src="js/global.js"></script>
-
-  <!-- Petite sécurité : après global.js, on rafraîchit les variables -->
   <script>
-    // Si global.js a défini des fonctions pour récupérer l'état, on les utilise
     if (typeof getGlobalMuted !== 'undefined') {
       window.gMute = getGlobalMuted();
       window.gVol = getGlobalVolume();
     }
   </script>
-  <!-- ========================================== -->
-  
   <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Rajdhani:wght@300;400;600;700&family=Special+Elite&display=swap" rel="stylesheet">
   <style>
+    /* Vos animations (inchangées) */
     @keyframes glitchText {
       0%, 100% { transform: translate(0); opacity: 1; }
       10% { transform: translate(-3px, 2px); opacity: 0.8; }
@@ -75,14 +69,6 @@
       0% { background-position: 0 0; }
       100% { background-position: 100% 100%; }
     }
-    @keyframes pulse {
-      0%,100% { opacity:1; transform:scale(1); }
-      50% { opacity:0.6; transform:scale(1.02); }
-    }
-    @keyframes float {
-      0%,100% { transform:translateY(0); }
-      50% { transform:translateY(-30px); }
-    }
     @keyframes spin {
       0% { transform: rotate(0); }
       100% { transform: rotate(360deg); }
@@ -98,7 +84,6 @@
       60% { transform: translateX(-4px); }
       80% { transform: translateX(4px); }
     }
-
     .glow {
       position:absolute;
       width:400px;
@@ -106,7 +91,6 @@
       background:radial-gradient(circle, rgba(200,80,80,0.2), transparent 70%);
       animation: float 6s infinite ease-in-out;
     }
-
     .core {
       width:120px;
       height:120px;
@@ -117,7 +101,6 @@
       margin-bottom:25px;
       position:relative;
     }
-
     .core::before {
       content:'';
       position:absolute;
@@ -126,14 +109,12 @@
       border:1px dashed rgba(232,213,196,0.3);
       animation: spinReverse 6s linear infinite;
     }
-
     #menu {
       display: flex;
       flex-direction: column;
       height: 100vh;
       width: 100%;
     }
-
     .title-glitch {
       animation: glitchText 4s infinite;
     }
@@ -154,7 +135,6 @@
       animation: glitchLayer2 3s infinite;
       z-index: -1;
     }
-
     .menu-btn {
       backdrop-filter: blur(8px);
       border: 1px solid rgba(180, 60, 60, 0.3);
@@ -170,7 +150,6 @@
     .menu-btn:active {
       transform: scale(0.97);
     }
-
     .scanline-overlay::after {
       content: '';
       position: absolute;
@@ -179,37 +158,34 @@
       animation: scanline 3s linear infinite;
       pointer-events: none;
     }
-
     .noise-overlay {
       background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
       animation: noiseShift 0.5s steps(10) infinite;
     }
-
     .bg-image-layer {
       animation: subtleDrift 20s ease-in-out infinite;
     }
-
     .admin-btn {
       opacity: 0.3;
       transition: opacity 0.3s;
     }
     .admin-btn:hover { opacity: 1; }
-
     .bottom-icon {
       transition: all 0.3s ease;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
     }
     .bottom-icon:hover {
       color: #dc3545;
       transform: scale(1.2);
       filter: drop-shadow(0 0 8px rgba(200, 50, 50, 0.6));
     }
-
     .btn-appear {
       animation: fadeSlideUp 0.6s ease-out both;
     }
     .flicker { animation: flicker 5s infinite; }
-
-    /* Password input styles */
     #pwWrapper {
       display: flex;
       flex-direction: column;
@@ -288,45 +264,43 @@
     }
     #pwError.visible { opacity: 1; }
     .shake { animation: shake 0.4s ease; }
+    /* Petit toast pour le partage */
+    .share-toast {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(10,6,8,0.95);
+      border: 1px solid #c8524a;
+      border-radius: 30px;
+      padding: 6px 18px;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 13px;
+      letter-spacing: 1px;
+      color: #e8d5c4;
+      z-index: 300;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      white-space: nowrap;
+      backdrop-filter: blur(8px);
+    }
   </style>
   <style>body { box-sizing: border-box; }</style>
 </head>
 <body class="h-full">
 
-<!-- INTRO SCREEN -->
-<div id="intro" style="
-  position:fixed;
-  inset:0;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  background: radial-gradient(circle at center, #12070a 0%, #000 100%);
-  color:#e8d5c4;
-  font-family:'Rajdhani',sans-serif;
-  z-index:99999;
-  overflow:hidden;
-  text-align:center;
-  transition: opacity 0.8s ease;
-">
+<div id="intro" style="position:fixed; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; background: radial-gradient(circle at center, #12070a 0%, #000 100%); color:#e8d5c4; font-family:'Rajdhani',sans-serif; z-index:99999; overflow:hidden; text-align:center; transition: opacity 0.8s ease;">
   <div style="font-size: clamp(0.75rem, 2.5vw, 1rem); letter-spacing: 3px; text-transform: uppercase; color: rgba(232,213,196,0.55); margin-bottom: 28px; max-width: 340px; line-height: 1.6; animation: flicker 2.5s infinite;">
     THIS IS A NON-OFFICIAL GAME.<br>YOUR DISCRETION IS REQUIRED.
   </div>
-
-  <div id="statusText" style="font-size:20px;letter-spacing:4px;text-transform:uppercase;animation: flicker 2.5s infinite;">
-    Loading Otome Game
-  </div>
-  <div id="subText" style="margin-top:10px;opacity:0.6;font-size:14px;">
-    initializing...
-  </div>
-
+  <div id="statusText" style="font-size:20px;letter-spacing:4px;text-transform:uppercase;animation: flicker 2.5s infinite;">Loading Otome Game</div>
+  <div id="subText" style="margin-top:10px;opacity:0.6;font-size:14px;">initializing...</div>
   <div id="pwWrapper">
     <div style="font-size:13px;opacity:0.6;letter-spacing:2px;margin-bottom:4px;">ENTER THE PASSWORD</div>
     <div class="pw-input-row">
       <input id="pwInput" type="password" placeholder="password" autocomplete="off" />
-      <button id="pwToggle" type="button" aria-label="Toggle password visibility">
-        <i id="pwEyeIcon" data-lucide="eye" style="width:16px;height:16px;"></i>
-      </button>
+      <button id="pwToggle" type="button" aria-label="Toggle password visibility"><i id="pwEyeIcon" data-lucide="eye" style="width:16px;height:16px;"></i></button>
       <button id="pwSubmit" type="button">ENTER</button>
     </div>
     <div id="pwError">Incorrect password.</div>
@@ -335,102 +309,79 @@
 
 <audio id="menuMusic"></audio>
 
-<!-- MAIN MENU -->
 <div id="menu" class="relative w-full h-full overflow-hidden scanline-overlay" style="background: #0a0608; display:none;">
-
   <picture id="bg-picture">
     <source media="(max-width: 768px)" srcset="images/menuwallpaperformobilewidth.png, images/menuwallpaperformobilewidth.jpg" type="image/webp">
     <source media="(max-width: 768px)" srcset="images/menuwallpaperformobilewidth.jpg" type="image/png">
     <source media="(min-width: 769px)" srcset="images/menuwallpaper.png, images/menuwallpaper.jpg" type="image/webp">
     <source media="(min-width: 769px)" srcset="images/menuwallpaper.jpg" type="image/png">
-    <img id="bg-img" src="images/menuwallpaper.jpg" alt="Background"
-      class="absolute inset-0 w-full h-full object-cover bg-image-layer"
-      style="filter: brightness(0.6) contrast(1.05) saturate(0.85);"
-      loading="lazy"
-      onerror="console.warn('Background image failed to load:', this.src); this.parentElement.style.display='none';">
+    <img id="bg-img" src="images/menuwallpaper.jpg" alt="Background" class="absolute inset-0 w-full h-full object-cover bg-image-layer" style="filter: brightness(0.6) contrast(1.05) saturate(0.85);" loading="lazy" onerror="console.warn('Background image failed to load:', this.src); this.parentElement.style.display='none';">
   </picture>
-
   <div class="absolute inset-0" style="background: linear-gradient(180deg, rgba(10,6,8,0.35) 0%, rgba(10,6,8,0.1) 40%, rgba(10,6,8,0.2) 70%, rgba(10,6,8,0.7) 100%);"></div>
   <div class="absolute inset-0" style="background: radial-gradient(ellipse at center 30%, transparent 40%, rgba(10,6,8,0.25) 100%);"></div>
   <div class="absolute inset-0 noise-overlay pointer-events-none"></div>
   <div class="absolute inset-0 pointer-events-none" style="box-shadow: inset 0 0 100px 40px rgba(0,0,0,0.4);"></div>
 
   <div class="relative z-10 flex flex-col items-center justify-between h-full w-full px-4 py-8">
-
     <div class="w-full flex justify-end pr-4 pt-2" id="admin-container" style="display:none;">
-      <button id="admin-btn" class="admin-btn text-xs px-3 py-2 rounded border border-red-700/50 text-red-300"
-        style="font-family:'Rajdhani',sans-serif; background: rgba(60,20,20,0.6); transition: all 0.3s ease;">
-        🛡️ ADMIN
-      </button>
+      <button id="admin-btn" class="admin-btn text-xs px-3 py-2 rounded border border-red-700/50 text-red-300" style="font-family:'Rajdhani',sans-serif; background: rgba(60,20,20,0.6); transition: all 0.3s ease;">🛡️ ADMIN</button>
     </div>
     <div id="admin-spacer" style="height: 0;"></div>
 
     <div class="flex flex-col items-center mt-4 flicker">
-      <h1 id="main-title" class="title-glitch relative text-center font-bold tracking-widest uppercase leading-tight"
-        data-text="Bungou Stray Dogs"
-        style="font-family:'Cinzel Decorative',serif; font-size: clamp(1.6rem, 5vw, 3.2rem); color: #e8d5c4; text-shadow: 0 0 30px rgba(180,60,40,0.4), 0 2px 10px rgba(0,0,0,0.8);">
-        Bungou Stray Dogs
-      </h1>
+      <h1 id="main-title" class="title-glitch relative text-center font-bold tracking-widest uppercase leading-tight" data-text="Bungou Stray Dogs" style="font-family:'Cinzel Decorative',serif; font-size: clamp(1.6rem, 5vw, 3.2rem); color: #e8d5c4; text-shadow: 0 0 30px rgba(180,60,40,0.4), 0 2px 10px rgba(0,0,0,0.8);">Bungou Stray Dogs</h1>
       <div class="w-24 h-px my-3" style="background: linear-gradient(90deg, transparent, #8b3a3a, transparent);"></div>
-      <h2 id="subtitle" class="tracking-[0.5em] uppercase text-center"
-        style="font-family:'Special Elite',cursive; font-size: clamp(1.1rem, 3vw, 2rem); color: #c8524a; text-shadow: 0 0 20px rgba(200,50,50,0.5);">
-        Page 0
-      </h2>
+      <h2 id="subtitle" class="tracking-[0.5em] uppercase text-center" style="font-family:'Special Elite',cursive; font-size: clamp(1.1rem, 3vw, 2rem); color: #c8524a; text-shadow: 0 0 20px rgba(200,50,50,0.5);">Page 0</h2>
     </div>
 
     <nav class="flex flex-col items-center justify-center gap-2 w-full max-w-xs my-6">
-      <button id="mainActionBtn" onclick="startGame()"
-        class="menu-btn btn-appear w-full py-3 px-6 rounded-lg flex items-center justify-center gap-3"
-        style="background: rgba(60,15,15,0.25); animation-delay: 0.1s; font-family:'Rajdhani',sans-serif;">
+      <button id="mainActionBtn" onclick="startGame()" class="menu-btn btn-appear w-full py-3 px-6 rounded-lg flex items-center justify-center gap-3" style="background: rgba(60,15,15,0.25); animation-delay: 0.1s; font-family:'Rajdhani',sans-serif;">
         <i id="mainActionIcon" data-lucide="play" style="width:20px;height:20px;color:#c8524a;flex-shrink:0;"></i>
         <span id="mainActionLabel" class="text-base font-semibold tracking-wider uppercase" style="color:#e8d5c4;">Start Game</span>
       </button>
-
-      <button onclick="window.location.href='chapters.html'"
-        class="menu-btn btn-appear w-full py-3 px-6 rounded-lg flex items-center justify-center gap-3"
-        style="background: rgba(60,15,15,0.25); animation-delay: 0.25s; font-family:'Rajdhani',sans-serif;">
+      <button onclick="window.location.href='chapters.html'" class="menu-btn btn-appear w-full py-3 px-6 rounded-lg flex items-center justify-center gap-3" style="background: rgba(60,15,15,0.25); animation-delay: 0.25s; font-family:'Rajdhani',sans-serif;">
         <i data-lucide="book-open" style="width:20px;height:20px;color:#c8524a;flex-shrink:0;"></i>
         <span class="text-base font-semibold tracking-wider uppercase" style="color:#e8d5c4;">Chapters</span>
       </button>
-
-      <button onclick="window.location.href='extras.html'"
-        class="menu-btn btn-appear w-full py-3 px-6 rounded-lg flex items-center justify-center gap-3"
-        style="background: rgba(60,15,15,0.25); animation-delay: 0.4s; font-family:'Rajdhani',sans-serif;">
+      <button onclick="window.location.href='extras.html'" class="menu-btn btn-appear w-full py-3 px-6 rounded-lg flex items-center justify-center gap-3" style="background: rgba(60,15,15,0.25); animation-delay: 0.4s; font-family:'Rajdhani',sans-serif;">
         <i data-lucide="sparkles" style="width:20px;height:20px;color:#c8524a;flex-shrink:0;"></i>
         <span class="text-base font-semibold tracking-wider uppercase" style="color:#e8d5c4;">Extras</span>
       </button>
-
-      <button onclick="goSettings()"
-        class="menu-btn btn-appear w-full py-3 px-6 rounded-lg flex items-center justify-center gap-3"
-        style="background: rgba(60,15,15,0.25); animation-delay: 0.55s; font-family:'Rajdhani',sans-serif;">
+      <button onclick="goSettings()" class="menu-btn btn-appear w-full py-3 px-6 rounded-lg flex items-center justify-center gap-3" style="background: rgba(60,15,15,0.25); animation-delay: 0.55s; font-family:'Rajdhani',sans-serif;">
         <i data-lucide="settings" style="width:20px;height:20px;color:#c8524a;flex-shrink:0;"></i>
         <span class="text-base font-semibold tracking-wider uppercase" style="color:#e8d5c4;">Settings</span>
       </button>
     </nav>
 
     <div class="flex items-center gap-6 pb-2">
-      <button onclick="goInfo()" class="bottom-icon" style="color: #e8d5c4aa; background:none; border:none; cursor:pointer; padding:0;">
+      <button onclick="goInfo()" class="bottom-icon" style="color: #e8d5c4aa;">
         <i data-lucide="info" style="width:26px;height:26px;"></i>
       </button>
+      <!-- Nouveau bouton de partage -->
+      <button onclick="shareGame()" class="bottom-icon" style="color: #e8d5c4aa;">
+        <i data-lucide="share-2" style="width:26px;height:26px;"></i>
+      </button>
     </div>
-
   </div>
 </div>
 
+<div id="shareToast" class="share-toast">Lien copié !</div>
+
 <script>
   // =====================
-  // SAVE SYSTEM (progression)
+  // SAVE SYSTEM (progression) – aligné avec game.html (v2)
   // =====================
-const SAVE_KEY = "otome_save_v2";
+  const SAVE_KEY = "otome_save_v2";
 
-function getDefaultSave() {
-  return {
-    unlockedChapters: [1],
-    currentChapter: 1,
-    currentSceneId: null,
-    affection: {}
-  };
-}
+  function getDefaultSave() {
+    return {
+      unlockedChapters: [1],
+      currentChapter: 1,
+      currentSceneId: null,
+      affection: {}
+    };
+  }
+
   function loadSave() {
     const data = localStorage.getItem(SAVE_KEY);
     if (!data) return getDefaultSave();
@@ -438,10 +389,10 @@ function getDefaultSave() {
     catch (e) { localStorage.removeItem(SAVE_KEY); return getDefaultSave(); }
   }
 
+  // Conservé pour compatibilité (non utilisé mais présent)
   function saveGame(data) {
     localStorage.setItem(SAVE_KEY, JSON.stringify(data));
   }
-
   function updateProgress(chapter, scene) {
     let save = loadSave();
     save.currentChapter = chapter;
@@ -455,17 +406,48 @@ function getDefaultSave() {
   }
 
   // =====================
-  // NAV
+  // NAVIGATION
   // =====================
   function startGame() { window.location.href = "game.html"; }
   function goSettings() { window.location.href = "settings.html"; }
   function goInfo() { window.location.href = "info.html"; }
 
   // =====================
-  // ADMIN
+  // PARTAGE (Web Share API + fallback copie)
+  // =====================
+  function shareGame() {
+    const url = window.location.href;
+    const title = "Bungou Stray Dogs - Page 0";
+    const text = "Découvre ce jeu otome non officiel !";
+
+    if (navigator.share) {
+      navigator.share({ title, text, url })
+        .catch(err => { if (err.name !== 'AbortError') copyToClipboard(url); });
+    } else {
+      copyToClipboard(url);
+    }
+  }
+
+  function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+      const toast = document.getElementById('shareToast');
+      toast.textContent = "🔗 Lien copié !";
+      toast.style.opacity = "1";
+      setTimeout(() => { toast.style.opacity = "0"; }, 2000);
+    }).catch(() => {
+      const toast = document.getElementById('shareToast');
+      toast.textContent = "❌ Copie manuelle : " + text;
+      toast.style.opacity = "1";
+      setTimeout(() => { toast.style.opacity = "0"; }, 3000);
+    });
+  }
+
+  // =====================
+  // ADMIN (localhost uniquement)
   // =====================
   if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
-    document.getElementById('admin-container').style.display = 'flex';
+    const adminContainer = document.getElementById('admin-container');
+    if (adminContainer) adminContainer.style.display = 'flex';
   }
   const adminBtn = document.getElementById('admin-btn');
   if (adminBtn) {
@@ -475,7 +457,7 @@ function getDefaultSave() {
   }
 
   // =====================
-  // INTRO LOGIC
+  // INTRO & MUSIQUE
   // =====================
   document.addEventListener("DOMContentLoaded", () => {
     const intro = document.getElementById("intro");
@@ -483,11 +465,8 @@ function getDefaultSave() {
     const audio = document.getElementById("menuMusic");
     audio.src   = "music/menu.mp3";
     audio.loop  = true;
-    
-    // APPLIQUER LE VOLUME GLOBAL À L'AUDIO (avant même de jouer)
     audio.volume = gMute ? 0 : gVol;
-    
-    // Bouton principal Start / Continue
+
     const mainActionLabel = document.getElementById("mainActionLabel");
     const mainActionIcon  = document.getElementById("mainActionIcon");
 
@@ -496,7 +475,6 @@ function getDefaultSave() {
       mainActionIcon.setAttribute("data-lucide", "rotate-ccw");
     }
 
-    // Si déjà authentifié dans cette session, skip l'intro
     if (sessionStorage.getItem("introDone") === "true") {
       intro.style.display = "none";
       menu.style.display  = "flex";
@@ -548,7 +526,6 @@ function getDefaultSave() {
       setTimeout(() => pwInput.focus(), 300);
     }
 
-    // Toggle eye icon
     let pwVisible = false;
     pwToggle.addEventListener("click", () => {
       pwVisible = !pwVisible;
@@ -557,7 +534,6 @@ function getDefaultSave() {
       lucide.createIcons();
     });
 
-    // Vérification du mot de passe
     async function checkPassword() {
       if (phase !== "ready") return;
       const entered = pwInput.value.trim();
@@ -577,14 +553,11 @@ function getDefaultSave() {
           const data = await res.json();
           ok = data.ok;
         } catch(fetchErr) {
-          // Fallback local (dev uniquement — retirer avant Vercel)
           ok = (entered === "1234");
         }
 
         if (ok) {
-          // Mot de passe correct
           intro.style.opacity = "0";
-          // Appliquer de nouveau le volume avant de jouer
           audio.volume = gMute ? 0 : gVol;
           try { await audio.play(); } catch(e) { console.warn("Audio play blocked", e); }
           setTimeout(() => {
@@ -594,7 +567,6 @@ function getDefaultSave() {
             lucide.createIcons();
           }, 800);
         } else {
-          // Mauvais mot de passe
           pwError.classList.add("visible");
           pwInput.classList.add("shake");
           pwInput.value = "";
