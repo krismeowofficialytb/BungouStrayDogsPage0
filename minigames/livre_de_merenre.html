@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Le Livre de Mérenrê</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=IM+Fell+English:ital@0;1&family=Rajdhani:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#c8a050;--gold2:#e8c870;--gold3:#a07830;
+  --dark:#080610;--dark2:#100c1a;--ink:#04020a;
+  --cream:#f0e0c0;--cream2:#d8c8a0;
+  --red:#c04040;--red2:#e06060;
+  --white-kb:#e8e0d0;
+  --bg-glow:rgba(200,160,80,0.12);
+}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--dark);color:var(--cream);font-family:'IM Fell English',Georgia,serif}
+canvas{position:absolute;inset:0;pointer-events:none}
+#app{position:relative;width:100%;height:100%;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center}
+
+/* ── TOPBAR ── */
+#topbar{
+  position:fixed;top:0;left:0;right:0;z-index:50;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 20px;
+  background:linear-gradient(to bottom,rgba(4,2,10,.95),transparent);
+}
+.tbtn{
+  display:flex;align-items:center;gap:6px;
+  background:rgba(4,2,10,.7);border:1px solid rgba(200,160,80,.3);
+  border-radius:8px;color:var(--cream);font-family:'Rajdhani',sans-serif;
+  font-size:11px;letter-spacing:2px;text-transform:uppercase;
+  padding:6px 14px;cursor:pointer;transition:all .2s;
+}
+.tbtn:hover{background:rgba(200,160,80,.15);border-color:rgba(200,160,80,.6)}
+.tbtn svg{width:13px;height:13px;stroke:var(--gold);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+#top-title{font-family:'Cinzel Decorative',serif;font-size:13px;letter-spacing:3px;color:var(--cream);opacity:.55;text-align:center;flex:1;padding:0 10px}
+
+/* ── SLIDES ── */
+#slide-container{
+  position:relative;z-index:10;
+  width:100%;height:100%;
+  display:flex;align-items:center;justify-content:center;
+  padding:70px 20px 90px;
+}
+.slide{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:70px 40px 90px;
+  opacity:0;pointer-events:none;
+  transition:opacity .6s ease;
+}
+.slide.active{opacity:1;pointer-events:all}
+
+/* SLIDE 0 – Intro */
+#sl-intro .book-3d{position:relative;width:200px;height:260px;perspective:900px;margin-bottom:40px}
+#sl-intro .book-3d-inner{
+  width:100%;height:100%;position:relative;
+  transform-style:preserve-3d;
+  animation:bookFloat 5s ease-in-out infinite, bookRotateSlow 20s linear infinite;
+}
+@keyframes bookFloat{0%,100%{transform:translateY(0) rotateY(-15deg)}50%{transform:translateY(-14px) rotateY(-15deg)}}
+@keyframes bookRotateSlow{0%{transform:rotateY(-25deg)}50%{transform:rotateY(-5deg)}100%{transform:rotateY(-25deg)}}
+.book-face,.book-spine,.book-back{position:absolute;backface-visibility:visible}
+.book-face{
+  width:150px;height:260px;right:0;
+  background:linear-gradient(160deg,#1a1008 0%,#100c04 60%,#0c0802 100%);
+  border:1px solid var(--gold3);border-radius:2px 6px 6px 2px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;
+  box-shadow:4px 0 20px rgba(0,0,0,.8),inset -1px 0 0 rgba(200,160,80,.2);
+}
+.book-spine{
+  width:40px;height:260px;left:0;top:0;
+  background:linear-gradient(to right,#0c0802,#1a1008,#100c04);
+  border:1px solid var(--gold3);border-right:none;border-radius:6px 0 0 6px;
+  transform:rotateY(-90deg) translateZ(-1px);
+  transform-origin:right center;
+}
+.book-hieroglyph{font-size:22px;color:var(--gold);opacity:.7;letter-spacing:4px;text-align:center;line-height:2}
+.book-title-text{font-family:'Cinzel Decorative',serif;font-size:8px;letter-spacing:2px;color:var(--gold2);text-align:center;line-height:1.8;text-shadow:0 0 10px rgba(200,160,80,.5)}
+.book-glow-line{width:60%;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.6}
+
+.intro-title{font-family:'Cinzel Decorative',serif;font-size:clamp(1.2rem,4vw,2rem);letter-spacing:.08em;color:var(--cream);text-align:center;line-height:1.4;text-shadow:0 0 30px rgba(200,160,80,.4)}
+.intro-sub{font-family:'IM Fell English',serif;font-style:italic;font-size:15px;color:var(--cream2);text-align:center;max-width:480px;line-height:1.8;margin-top:16px;opacity:.85}
+.intro-warning{
+  margin-top:28px;padding:12px 24px;
+  border:1px solid rgba(200,160,80,.3);border-radius:8px;
+  background:rgba(200,160,80,.07);
+  font-size:13px;color:var(--cream2);text-align:center;line-height:1.6;max-width:440px;
+}
+.intro-warning strong{color:var(--gold);font-style:normal}
+
+/* SLIDE 1 – Affinité */
+#sl-affinity .aff-meter{
+  position:relative;width:200px;margin:0 auto 30px;
+  perspective:600px;
+}
+.dial-3d{
+  width:200px;height:200px;border-radius:50%;
+  background:conic-gradient(
+    var(--red2) 0deg 60deg,
+    #804040 60deg 120deg,
+    rgba(200,160,80,.1) 120deg 180deg,
+    rgba(200,160,80,.1) 180deg 240deg,
+    #407040 240deg 300deg,
+    #50c050 300deg 360deg
+  );
+  border:2px solid rgba(200,160,80,.4);
+  display:flex;align-items:center;justify-content:center;
+  animation:dialSpin 8s ease-in-out infinite;
+  box-shadow:0 0 40px rgba(200,160,80,.15),inset 0 0 40px rgba(0,0,0,.6);
+}
+@keyframes dialSpin{0%,100%{transform:rotateX(30deg) rotateZ(0deg)}50%{transform:rotateX(30deg) rotateZ(10deg)}}
+.dial-center{
+  width:120px;height:120px;border-radius:50%;
+  background:var(--dark);border:1px solid rgba(200,160,80,.3);
+  display:flex;align-items:center;justify-content:center;flex-direction:column;
+}
+.dial-val{font-family:'Cinzel Decorative',serif;font-size:24px;color:var(--gold);animation:valPulse 2s ease-in-out infinite}
+.dial-label{font-size:9px;letter-spacing:2px;color:var(--cream2);opacity:.6;text-transform:uppercase;margin-top:2px}
+@keyframes valPulse{0%,100%{opacity:.7}50%{opacity:1}}
+.dial-tick{position:absolute;width:2px;height:16px;background:var(--gold);border-radius:1px;transform-origin:50% 100px;opacity:.5}
+
+.rule-card{
+  background:rgba(200,160,80,.06);border:1px solid rgba(200,160,80,.2);
+  border-radius:10px;padding:16px 20px;max-width:500px;width:100%;
+  margin:8px 0;
+}
+.rule-card-title{font-family:'Rajdhani',sans-serif;font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+.rule-card p{font-size:14px;line-height:1.75;color:var(--cream2)}
+.rule-card strong{color:var(--cream);font-style:normal}
+
+/* SLIDE 2 – Khepry Blanc */
+#sl-white .khepry-scene{
+  position:relative;margin:0 auto 30px;
+  width:200px;height:200px;
+  perspective:800px;
+}
+.scarab{
+  position:absolute;left:50%;top:50%;
+  transform-style:preserve-3d;
+  animation:scarabOrbit 6s ease-in-out infinite;
+}
+@keyframes scarabOrbit{
+  0%{transform:translate(-50%,-50%) rotateY(0deg) rotateX(15deg)}
+  100%{transform:translate(-50%,-50%) rotateY(360deg) rotateX(15deg)}
+}
+.scarab svg{filter:drop-shadow(0 0 12px rgba(220,200,100,.7));display:block}
+
+.ring-orbit{
+  position:absolute;left:50%;top:50%;
+  width:160px;height:60px;
+  border:1px solid rgba(200,160,80,.25);border-radius:50%;
+  transform:translate(-50%,-50%) rotateX(70deg);
+  animation:ringPulse 3s ease-in-out infinite;
+}
+@keyframes ringPulse{0%,100%{border-color:rgba(200,160,80,.15)}50%{border-color:rgba(200,160,80,.45)}}
+
+.outcome-table{
+  display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:500px;width:100%;
+  margin:10px 0;
+}
+.outcome-cell{
+  border-radius:10px;padding:14px 16px;text-align:center;
+  border:1px solid;
+}
+.outcome-cell.good{background:rgba(80,160,80,.08);border-color:rgba(80,180,80,.3)}
+.outcome-cell.bad{background:rgba(180,60,60,.08);border-color:rgba(200,60,60,.3)}
+.outcome-cell .oc-icon{font-size:22px;margin-bottom:6px}
+.outcome-cell .oc-label{font-family:'Rajdhani',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+.outcome-cell.good .oc-label{color:#80c080}
+.outcome-cell.bad .oc-label{color:var(--red2)}
+.outcome-cell p{font-size:12px;line-height:1.6;color:var(--cream2)}
+
+/* SLIDE 3 – Khepry Rouge */
+#sl-red .red-scarab-scene{
+  position:relative;margin:0 auto 30px;
+  width:200px;height:200px;perspective:800px;
+}
+.scarab-red{
+  position:absolute;left:50%;top:50%;
+  transform-style:preserve-3d;
+  animation:scarabOrbitRed 4s ease-in-out infinite;
+}
+@keyframes scarabOrbitRed{
+  0%{transform:translate(-50%,-50%) rotateY(0deg) rotateX(15deg)}
+  100%{transform:translate(-50%,-50%) rotateY(-360deg) rotateX(15deg)}
+}
+.scarab-red svg{filter:drop-shadow(0 0 14px rgba(200,60,60,.8));display:block}
+.ring-orbit-red{
+  position:absolute;left:50%;top:50%;
+  width:160px;height:60px;
+  border:1px solid rgba(200,60,60,.3);border-radius:50%;
+  transform:translate(-50%,-50%) rotateX(70deg);
+  animation:ringPulseRed 2s ease-in-out infinite;
+}
+@keyframes ringPulseRed{0%,100%{border-color:rgba(200,60,60,.15)}50%{border-color:rgba(200,60,60,.55)}}
+.red-warning{
+  background:rgba(180,40,40,.12);border:1px solid rgba(200,60,60,.35);
+  border-radius:10px;padding:16px 20px;max-width:480px;width:100%;
+  text-align:center;margin:8px 0;
+}
+.red-warning .rw-title{font-family:'Cinzel Decorative',serif;font-size:14px;letter-spacing:2px;color:var(--red2);margin-bottom:10px}
+.red-warning p{font-size:13px;line-height:1.75;color:var(--cream2)}
+.red-warning strong{color:var(--red2);font-style:normal}
+
+/* SLIDE 4 – Obligation */
+#sl-obligation .chains-scene{
+  position:relative;width:100%;max-width:320px;margin:0 auto 30px;height:80px;
+  display:flex;align-items:center;justify-content:center;gap:0;
+}
+.chain-link{
+  width:28px;height:16px;border:3px solid var(--gold3);border-radius:50%;
+  animation:chainShake 3s ease-in-out infinite;
+}
+.chain-link:nth-child(2){animation-delay:.1s}
+.chain-link:nth-child(3){animation-delay:.2s}
+.chain-link:nth-child(4){animation-delay:.3s}
+.chain-link:nth-child(5){animation-delay:.4s}
+.chain-link:nth-child(odd){transform:rotate(90deg)}
+@keyframes chainShake{0%,100%{border-color:var(--gold3)}50%{border-color:var(--gold2)}}
+.obl-card{
+  background:rgba(200,160,80,.06);border:1px solid rgba(200,160,80,.2);
+  border-radius:10px;padding:16px 20px;max-width:500px;width:100%;
+  text-align:center;margin:8px 0;
+}
+.obl-card .oc-icon-big{font-size:30px;margin-bottom:8px;display:block;animation:iconPulse 2s ease-in-out infinite}
+@keyframes iconPulse{0%,100%{filter:drop-shadow(0 0 4px rgba(200,160,80,.4))}50%{filter:drop-shadow(0 0 12px rgba(200,160,80,.8))}}
+.obl-card p{font-size:14px;line-height:1.8;color:var(--cream2)}
+.obl-card strong{color:var(--gold)}
+
+/* SLIDE 5 – Récap final */
+#sl-recap .recap-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:540px;width:100%;
+  margin:0 auto 24px;
+}
+.recap-item{
+  border-radius:10px;padding:14px 10px;text-align:center;
+  border:1px solid rgba(200,160,80,.2);background:rgba(200,160,80,.04);
+}
+.recap-item .ri-icon{margin:0 auto 8px;width:52px;height:52px}
+.recap-item .ri-label{font-family:'Rajdhani',sans-serif;font-size:10px;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
+.recap-item.neutral .ri-label{color:var(--gold)}
+.recap-item.good .ri-label{color:#70c070}
+.recap-item.bad .ri-label{color:var(--red2)}
+.recap-item p{font-size:11px;line-height:1.5;color:var(--cream2)}
+.start-btn{
+  margin-top:24px;padding:14px 36px;
+  background:rgba(200,160,80,.15);border:1px solid rgba(200,160,80,.45);
+  border-radius:10px;color:var(--cream);font-family:'Cinzel Decorative',serif;
+  font-size:13px;letter-spacing:3px;cursor:pointer;
+  transition:all .3s;
+  animation:btnPulse 3s ease-in-out infinite;
+}
+.start-btn:hover{background:rgba(200,160,80,.3);border-color:var(--gold);transform:scale(1.04)}
+@keyframes btnPulse{0%,100%{box-shadow:0 0 10px rgba(200,160,80,.2)}50%{box-shadow:0 0 25px rgba(200,160,80,.45)}}
+
+/* ── NAV ── */
+#nav{
+  position:fixed;bottom:0;left:0;right:0;z-index:50;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 20px;
+  background:linear-gradient(to top,rgba(4,2,10,.95),transparent);
+}
+.nav-btn{
+  display:flex;align-items:center;gap:6px;
+  background:rgba(4,2,10,.7);border:1px solid rgba(200,160,80,.3);
+  border-radius:8px;padding:8px 18px;color:var(--cream);font-family:'Rajdhani',sans-serif;
+  font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;
+  transition:all .2s;
+}
+.nav-btn:hover{background:rgba(200,160,80,.15);border-color:rgba(200,160,80,.6)}
+.nav-btn.disabled{opacity:.25;pointer-events:none}
+.nav-btn svg{width:14px;height:14px;stroke:var(--gold);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#page-dots{display:flex;gap:7px;align-items:center}
+.dot{width:7px;height:7px;border-radius:50%;background:rgba(200,160,80,.25);transition:all .3s;cursor:pointer}
+.dot.active{background:var(--gold);box-shadow:0 0 8px rgba(200,160,80,.6)}
+
+/* ── SECTION TITLE ── */
+.section-tag{font-family:'Rajdhani',sans-serif;font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);opacity:.7;margin-bottom:8px;text-align:center}
+.section-title{font-family:'Cinzel Decorative',serif;font-size:clamp(1.1rem,3.5vw,1.6rem);letter-spacing:.06em;color:var(--cream);text-align:center;margin-bottom:24px;text-shadow:0 0 20px rgba(200,160,80,.3)}
+.section-divider{width:80px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:0 auto 20px;opacity:.6}
+
+/* ── ANIMATIONS ENTRÉE ── */
+.slide.active .section-tag{animation:fadeSlide .5s .1s ease both}
+.slide.active .section-title{animation:fadeSlide .5s .2s ease both}
+.slide.active .section-divider{animation:fadeSlide .5s .25s ease both}
+.slide.active .book-3d{animation:fadeSlide .5s .3s ease both, bookFloat 5s ease-in-out infinite, bookRotateSlow 20s linear infinite}
+.slide.active .intro-title{animation:fadeSlide .5s .35s ease both}
+.slide.active .intro-sub{animation:fadeSlide .5s .45s ease both}
+.slide.active .intro-warning{animation:fadeSlide .5s .55s ease both}
+.slide.active .rule-card{animation:fadeSlide .5s ease both}
+.slide.active .rule-card:nth-child(2){animation-delay:.4s}
+.slide.active .rule-card:nth-child(3){animation-delay:.5s}
+.slide.active .outcome-table{animation:fadeSlide .5s .4s ease both}
+.slide.active .outcome-cell{animation:fadeSlide .5s ease both}
+.slide.active .outcome-cell:nth-child(2){animation-delay:.35s}
+.slide.active .red-warning{animation:fadeSlide .5s .4s ease both}
+.slide.active .obl-card{animation:fadeSlide .5s ease both}
+.slide.active .obl-card:nth-child(2){animation-delay:.35s}
+.slide.active .recap-grid{animation:fadeSlide .5s .3s ease both}
+.slide.active .start-btn{animation:fadeSlide .5s .7s ease both,btnPulse 3s ease-in-out infinite}
+@keyframes fadeSlide{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+/* SCROLLABLE content dans les slides */
+.slide-inner{
+  width:100%;max-width:560px;
+  display:flex;flex-direction:column;align-items:center;
+  overflow-y:auto;max-height:calc(100vh - 160px);
+  padding-bottom:10px;
+}
+.slide-inner::-webkit-scrollbar{width:3px}
+.slide-inner::-webkit-scrollbar-thumb{background:rgba(200,160,80,.3);border-radius:2px}
+
+@media(max-width:480px){
+  .outcome-table{grid-template-columns:1fr}
+  .recap-grid{grid-template-columns:1fr 1fr}
+  .section-title{font-size:1.1rem}
+  #sl-intro .book-3d{width:140px;height:180px}
+}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <!-- Canvas fond étoilé -->
+  <canvas id="bgCanvas"></canvas>
+  <audio id="bgMusic" src="music/regle.mp3" loop></audio>
+
+  <!-- TOPBAR -->
+  <div id="topbar">
+    <button class="tbtn" id="btn-pause" onclick="openPause()">
+      <svg viewBox="0 0 24 24"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+      Pause
+    </button>
+    <div id="top-title">Le Livre de Mérenrê</div>
+    <div style="display:flex;gap:8px">
+      <button class="tbtn" onclick="skipAll()">
+        <svg viewBox="0 0 24 24"><polyline points="5 4 15 12 5 20"/><line x1="19" y1="4" x2="19" y2="20"/></svg>
+        Passer
+      </button>
+    </div>
+  </div>
+
+  <!-- ══ SLIDE 0 : INTRO ══ -->
+  <div class="slide active" id="sl-intro">
+    <div class="slide-inner">
+      <div class="book-3d">
+        <div class="book-3d-inner">
+          <div class="book-spine"></div>
+          <div class="book-face">
+            <div class="book-hieroglyph">𓂀<br>𓆑<br>𓋹</div>
+            <div class="book-glow-line"></div>
+            <div class="book-title-text">LE LIVRE<br>DE<br>MÉRENRÊ</div>
+            <div class="book-glow-line"></div>
+            <div class="book-hieroglyph">𓃀<br>𓆣</div>
+          </div>
+        </div>
+      </div>
+      <div class="intro-title">Le Livre de Mérenrê</div>
+    </div>
+  </div>
+
+  <!-- ══ SLIDE 1 : AFFINITÉ ══ -->
+  <div class="slide" id="sl-affinity">
+    <div class="slide-inner">
+      <div class="section-tag">Le Détenteur</div>
+      <div class="section-title">L'Affinité</div>
+      <div class="section-divider"></div>
+
+      <!-- Dial 3D -->
+      <div class="aff-meter">
+        <div class="dial-3d" id="dialEl">
+          <div class="dial-center">
+            <div class="dial-val" id="dialVal">0</div>
+            <div class="dial-label">Affinité</div>
+          </div>
+        </div>
+        <canvas id="dialCanvas" width="200" height="200" style="position:absolute;top:0;left:0;pointer-events:none"></canvas>
+      </div>
+
+      <div class="rule-card" style="animation-delay:.3s">
+        <p>Tu es le nouveau Détenteur. Le livre donne au détenteur le pouvoir de voir l'<strong>affinité</strong> de certaines personnes. Le détenteur influence cette affinité par ses choix d'interactions. Tu est obligé de participer.</p>
+      </div>
+      <div class="rule-card" style="animation-delay:.4s">
+        <p>L'affinité varie de <strong>−100 à +100</strong>. Le détenteur doit trouver des Khepry — il ne peut obtenir qu'<strong>un seul Khepry par personne</strong>, blanc ou rouge.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SLIDE 2 : KHEPRY BLANC ══ -->
+  <div class="slide" id="sl-white">
+    <div class="slide-inner">
+      <div class="section-tag">Règle II</div>
+      <div class="section-title">Le Khepry Blanc</div>
+      <div class="section-divider"></div>
+
+      <div class="khepry-scene">
+        <div class="ring-orbit"></div>
+        <div style="position:absolute;left:50%;top:50%;width:16px;height:16px;background:rgba(200,160,80,.3);border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 20px rgba(200,160,80,.5)"></div>
+        <div class="scarab" id="scarabWhite">
+          <!-- Scarabée blanc SVG 3D -->
+          <svg width="80" height="80" viewBox="0 0 100 100">
+            <defs>
+              <radialGradient id="wbg" cx="40%" cy="30%">
+                <stop offset="0%" stop-color="#fff8e0"/>
+                <stop offset="40%" stop-color="#e8c870"/>
+                <stop offset="100%" stop-color="#a07020"/>
+              </radialGradient>
+              <radialGradient id="wbg2" cx="50%" cy="40%">
+                <stop offset="0%" stop-color="#fffce8"/>
+                <stop offset="100%" stop-color="#c8a040"/>
+              </radialGradient>
+              <filter id="wglow">
+                <feGaussianBlur stdDeviation="2.5" result="blur"/>
+                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+            </defs>
+            <!-- Corps principal -->
+            <ellipse cx="50" cy="55" rx="22" ry="28" fill="url(#wbg)" filter="url(#wglow)"/>
+            <!-- Reflet dos -->
+            <ellipse cx="45" cy="45" rx="10" ry="14" fill="rgba(255,255,220,.35)"/>
+            <!-- Tête -->
+            <ellipse cx="50" cy="28" rx="14" ry="10" fill="url(#wbg2)"/>
+            <!-- Pronotum -->
+            <ellipse cx="50" cy="38" rx="19" ry="10" fill="url(#wbg)"/>
+            <!-- Suture centrale -->
+            <line x1="50" y1="35" x2="50" y2="80" stroke="rgba(160,120,30,.5)" stroke-width="1"/>
+            <!-- Élytres gauche -->
+            <path d="M50 40 Q30 50 28 75 Q38 82 50 80 Z" fill="url(#wbg)" stroke="rgba(160,120,30,.3)" stroke-width=".5"/>
+            <!-- Élytres droite -->
+            <path d="M50 40 Q70 50 72 75 Q62 82 50 80 Z" fill="url(#wbg)" stroke="rgba(160,120,30,.3)" stroke-width=".5"/>
+            <!-- Pattes gauche -->
+            <line x1="35" y1="45" x2="15" y2="38" stroke="#c8a050" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="33" y1="55" x2="12" y2="55" stroke="#c8a050" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="35" y1="65" x2="15" y2="72" stroke="#c8a050" stroke-width="1.5" stroke-linecap="round"/>
+            <!-- Pattes droite -->
+            <line x1="65" y1="45" x2="85" y2="38" stroke="#c8a050" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="67" y1="55" x2="88" y2="55" stroke="#c8a050" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="65" y1="65" x2="85" y2="72" stroke="#c8a050" stroke-width="1.5" stroke-linecap="round"/>
+            <!-- Antennes -->
+            <path d="M43 22 Q35 10 30 6" stroke="#c8a050" stroke-width="1" fill="none" stroke-linecap="round"/>
+            <path d="M57 22 Q65 10 70 6" stroke="#c8a050" stroke-width="1" fill="none" stroke-linecap="round"/>
+            <!-- Yeux -->
+            <circle cx="44" cy="26" r="2" fill="#1a0c00"/>
+            <circle cx="56" cy="26" r="2" fill="#1a0c00"/>
+            <!-- Disque solaire -->
+            <circle cx="50" cy="16" r="6" fill="none" stroke="#e8c870" stroke-width="1.5"/>
+            <circle cx="50" cy="16" r="3" fill="#e8c870" opacity=".8"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="outcome-table">
+        <div class="outcome-cell good">
+          <div class="oc-icon">𓆣</div>
+          <div class="oc-label">1 Khepry Blanc</div>
+          <p>Il obtient une bonne fin.</p>
+        </div>
+        <div class="outcome-cell good" style="border-color:rgba(200,160,80,.4);background:rgba(200,160,80,.08)">
+          <div class="oc-icon" style="font-size:26px">𓆣𓆣𓆣<br>𓆣𓆣𓆣𓆣</div>
+          <div class="oc-label" style="color:var(--gold)">7 Khepry Blancs</div>
+          <p style="color:var(--cream2)">Il devient un <strong style="color:var(--gold)">Akh</strong>, un être immortel.</p>
+        </div>
+      </div>
+     
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ SLIDE 3 : KHEPRY ROUGE ══ -->
+  <div class="slide" id="sl-red">
+    <div class="slide-inner">
+      <div class="section-tag">Règle III</div>
+      <div class="section-title">Le Khepry Rouge</div>
+      <div class="section-divider"></div>
+
+      <div class="red-scarab-scene">
+        <div class="ring-orbit-red"></div>
+        <div style="position:absolute;left:50%;top:50%;width:16px;height:16px;background:rgba(180,40,40,.3);border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 20px rgba(200,60,60,.5)"></div>
+        <div class="scarab-red">
+          <svg width="80" height="80" viewBox="0 0 100 100">
+            <defs>
+              <radialGradient id="rbg" cx="40%" cy="30%">
+                <stop offset="0%" stop-color="#ff8070"/>
+                <stop offset="40%" stop-color="#c04040"/>
+                <stop offset="100%" stop-color="#5a1010"/>
+              </radialGradient>
+              <radialGradient id="rbg2" cx="50%" cy="40%">
+                <stop offset="0%" stop-color="#ff9080"/>
+                <stop offset="100%" stop-color="#802020"/>
+              </radialGradient>
+              <filter id="rglow">
+                <feGaussianBlur stdDeviation="3" result="blur"/>
+                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+            </defs>
+            <ellipse cx="50" cy="55" rx="22" ry="28" fill="url(#rbg)" filter="url(#rglow)"/>
+            <ellipse cx="45" cy="45" rx="10" ry="14" fill="rgba(255,120,100,.25)"/>
+            <ellipse cx="50" cy="28" rx="14" ry="10" fill="url(#rbg2)"/>
+            <ellipse cx="50" cy="38" rx="19" ry="10" fill="url(#rbg)"/>
+            <line x1="50" y1="35" x2="50" y2="80" stroke="rgba(120,30,30,.5)" stroke-width="1"/>
+            <path d="M50 40 Q30 50 28 75 Q38 82 50 80 Z" fill="url(#rbg)" stroke="rgba(120,30,30,.4)" stroke-width=".5"/>
+            <path d="M50 40 Q70 50 72 75 Q62 82 50 80 Z" fill="url(#rbg)" stroke="rgba(120,30,30,.4)" stroke-width=".5"/>
+            <line x1="35" y1="45" x2="15" y2="38" stroke="#c04040" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="33" y1="55" x2="12" y2="55" stroke="#c04040" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="35" y1="65" x2="15" y2="72" stroke="#c04040" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="65" y1="45" x2="85" y2="38" stroke="#c04040" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="67" y1="55" x2="88" y2="55" stroke="#c04040" stroke-width="1.5" stroke-linecap="round"/>
+            <line x1="65" y1="65" x2="85" y2="72" stroke="#c04040" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M43 22 Q35 10 30 6" stroke="#e06060" stroke-width="1" fill="none" stroke-linecap="round"/>
+            <path d="M57 22 Q65 10 70 6" stroke="#e06060" stroke-width="1" fill="none" stroke-linecap="round"/>
+            <circle cx="44" cy="26" r="2.5" fill="#1a0000"/>
+            <circle cx="56" cy="26" r="2.5" fill="#1a0000"/>
+            <!-- Disque fissured -->
+            <circle cx="50" cy="16" r="6" fill="none" stroke="#e06060" stroke-width="1.5"/>
+            <circle cx="50" cy="16" r="3" fill="#c04040" opacity=".9"/>
+            <line x1="47" y1="14" x2="53" y2="18" stroke="#801010" stroke-width="1" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="red-warning">
+        <div class="rw-title">1 Khepry Rouge = Mauvaise fin</div>
+        <p> Le Détenteur meurt. Son âme est détruite.</p>
+      </div>
+      <div class="rule-card" style="animation-delay:.5s;border-color:rgba(200,60,60,.25)">
+        <div class="rule-card-title" style="color:var(--red2)">𓆣 L'histoire de Mérenrê</div>
+        <p>Il a obtenu un Khepry Rouge avant d'avoir complété les sept. Ses prêtres ont scellé le livre après sa mort.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- NAV -->
+  <div id="nav">
+    <button class="nav-btn disabled" id="btnPrev" onclick="prevSlide()">
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+      Retour
+    </button>
+    <div id="page-dots"></div>
+    <button class="nav-btn" id="btnNext" onclick="nextSlide()">
+      Suivant
+      <svg viewBox="0 0 24 24"><polyline points="9 6 15 12 9 18"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- Pause overlay -->
+<div id="pause-ov" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(4,2,10,.92);backdrop-filter:blur(12px);align-items:center;justify-content:center">
+  <div style="background:rgba(10,6,16,.97);border:1px solid rgba(200,160,80,.35);border-radius:16px;padding:36px 44px;min-width:280px;text-align:center">
+    <h2 style="font-family:'Cinzel Decorative',serif;font-size:1.3rem;letter-spacing:3px;color:var(--cream);margin-bottom:24px">Pause</h2>
+    <button class="nav-btn" style="width:100%;justify-content:center;margin-bottom:10px" onclick="closePause()">▶ Reprendre</button>
+    <button class="nav-btn" style="width:100%;justify-content:center;color:#e08080;border-color:rgba(200,80,80,.3)" onclick="goGame()">🏠 Retour au jeu</button>
+  </div>
+</div>
+
+<script>
+const TOTAL = 4;
+let current = 0;
+
+const slides = document.querySelectorAll('.slide');
+const btnPrev = document.getElementById('btnPrev');
+const btnNext = document.getElementById('btnNext');
+const dotsEl  = document.getElementById('page-dots');
+
+/* ── DOTS ── */
+function buildDots(){
+  dotsEl.innerHTML='';
+  for(let i=0;i<TOTAL;i++){
+    const d=document.createElement('div');
+    d.className='dot'+(i===current?' active':'');
+    d.onclick=()=>goTo(i);
+    dotsEl.appendChild(d);
+  }
+}
+function updateDots(){
+  dotsEl.querySelectorAll('.dot').forEach((d,i)=>d.classList.toggle('active',i===current));
+}
+
+function goTo(n){
+  slides[current].classList.remove('active');
+  current=Math.max(0,Math.min(TOTAL-1,n));
+  slides[current].classList.add('active');
+  updateDots();
+  btnPrev.classList.toggle('disabled',current===0);
+  const isLast=current===TOTAL-1;
+  btnNext.innerHTML=isLast
+    ?'Suivant <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:var(--gold);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><polyline points="9 6 15 12 9 18"/></svg>'
+    :'Suivant <svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:var(--gold);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round"><polyline points="9 6 15 12 9 18"/></svg>';
+  if(isLast) btnNext.onclick=finishAndReturn;
+  else btnNext.onclick=nextSlide;
+  if(current===1) animateDial();
+}
+
+function prevSlide(){goTo(current-1)}
+function nextSlide(){goTo(current+1)}
+function skipAll(){goTo(TOTAL-1)}
+function openPause(){document.getElementById('pause-ov').style.display='flex'}
+function closePause(){document.getElementById('pause-ov').style.display='none'}
+
+function goGame(){
+  // Retour au jeu — envoie un message postMessage ou redirige
+  if(window.parent && window.parent !== window){
+    window.parent.postMessage({type:'otome_goto',scene:'c2_s01'},'*');
+  } else {
+    window.location.href='index.html';
+  }
+}
+function finishAndReturn(){
+  if(window.parent && window.parent !== window){
+    window.parent.postMessage({type:'otome_goto',scene:'c2_s01'},'*');
+  } else {
+    window.location.href='game.html';
+  }
+}
+
+buildDots();
+goTo(0);
+
+/* ── MUSIQUE ── */
+const bgMusic = document.getElementById('bgMusic');
+const vol = parseFloat(localStorage.getItem('game_volume') ?? '0.5');
+const muted = localStorage.getItem('game_mute') === 'true';
+bgMusic.volume = muted ? 0 : vol;
+function startMusic(){ bgMusic.play().catch(()=>{}); }
+document.addEventListener('click', startMusic, {once:true});
+document.addEventListener('keydown', startMusic, {once:true});
+bgMusic.play().catch(()=>{});
+
+/* ── DIAL ANIMATION ── */
+let dialAnimFrame;
+function animateDial(){
+  cancelAnimationFrame(dialAnimFrame);
+  const valEl=document.getElementById('dialVal');
+  if(!valEl)return;
+  let v=0,dir=1,t=0;
+  function step(){
+    t++;
+    if(t%4===0){v+=dir*3;if(v>=100)dir=-1;if(v<=-80)dir=1;}
+    valEl.textContent=(v>0?'+':'')+Math.round(v);
+    valEl.style.color=v>50?'#50c050':v>0?'#c8a050':v>-50?'#e08040':'#e06060';
+    dialAnimFrame=requestAnimationFrame(step);
+  }
+  step();
+}
+
+/* ── CANVAS FOND ÉTOILÉ ── */
+const bgCanvas=document.getElementById('bgCanvas');
+const bgCtx=bgCanvas.getContext('2d');
+let stars=[],particles2=[];
+
+function initBg(){
+  bgCanvas.width=window.innerWidth;bgCanvas.height=window.innerHeight;
+  stars=[];
+  for(let i=0;i<120;i++){
+    stars.push({
+      x:Math.random()*bgCanvas.width,y:Math.random()*bgCanvas.height,
+      r:Math.random()*1.3+.2,a:Math.random(),sp:Math.random()*.006+.002,ph:Math.random()*Math.PI*2
+    });
+  }
+  // Quelques particules dorées
+  particles2=[];
+  for(let i=0;i<20;i++){
+    particles2.push({
+      x:Math.random()*bgCanvas.width,y:Math.random()*bgCanvas.height,
+      r:Math.random()*.8+.3,vy:-(Math.random()*.4+.1),
+      a:Math.random()*.7+.2,life:Math.random()*200
+    });
+  }
+}
+
+function drawBg(t){
+  const w=bgCanvas.width,h=bgCanvas.height;
+  bgCtx.clearRect(0,0,w,h);
+  bgCtx.fillStyle='#080610';bgCtx.fillRect(0,0,w,h);
+
+  // Lueur centrale
+  const cx=w/2,cy=h/2;
+  const g=bgCtx.createRadialGradient(cx,cy,0,cx,cy,Math.max(w,h)*.55);
+  g.addColorStop(0,'rgba(200,160,80,.07)');g.addColorStop(1,'transparent');
+  bgCtx.fillStyle=g;bgCtx.fillRect(0,0,w,h);
+
+  // Étoiles
+  stars.forEach(s=>{
+    s.a=.2+.8*(0.5+0.5*Math.sin(t*.001*s.sp*1000+s.ph));
+    bgCtx.beginPath();bgCtx.arc(s.x,s.y,s.r,0,Math.PI*2);
+    bgCtx.fillStyle=`rgba(230,210,160,${s.a})`;bgCtx.fill();
+  });
+
+  // Particules dorées
+  particles2.forEach(p=>{
+    p.y+=p.vy;p.life--;
+    if(p.life<=0||p.y<-5){p.y=h+5;p.x=Math.random()*w;p.life=Math.random()*200+100;}
+    bgCtx.beginPath();bgCtx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    bgCtx.fillStyle=`rgba(200,160,80,${p.a*(p.life/200)})`;bgCtx.fill();
+  });
+
+  // Lignes hiéroglyphe subtiles
+  const lineCols=['rgba(200,160,80,.025)','rgba(200,160,80,.02)'];
+  for(let i=0;i<3;i++){
+    bgCtx.beginPath();bgCtx.ellipse(cx,cy,(80+i*60),(30+i*25),0,0,Math.PI*2);
+    bgCtx.strokeStyle=lineCols[i%2];bgCtx.lineWidth=.5;bgCtx.stroke();
+  }
+
+  requestAnimationFrame(drawBg);
+}
+
+window.addEventListener('resize',initBg);
+initBg();
+requestAnimationFrame(drawBg);
+
+/* ── CLAVIER ── */
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key===' '||e.key==='Enter'){e.preventDefault();nextSlide();}
+  if(e.key==='ArrowLeft'){e.preventDefault();prevSlide();}
+  if(e.key==='Escape')openPause();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,253 @@
+{
+  "chapter": 3,
+  "title": "Le Seuil du Souvenir",
+  "type": "main",
+  "thumbnail": "images/thumbnails/ch3.jpg",
+  "start": "c3_s01",
+
+  "love_interests": ["Dazai", "Kunikida", "Ranpo", "Lucy", "Atsushi", "Chuuya", "Akutagawa"],
+
+  "scenes": {
+
+    "c3_s01": {
+      "id": "c3_s01",
+      "background": "yokohama_night.webp",
+      "character": null,
+      "speaker": null,
+      "text": "Trois jours ont passé. Yokohama s'endort sous la pluie. Je suis sur le toit de l'Agence.",
+      "pause": 700,
+      "music": "rain.mp3",
+      "next": "c3_s02"
+    },
+
+    "c3_s02": {
+      "id": "c3_s02",
+      "background": "yokohama_night.webp",
+      "character": "atsushi_casual.png",
+      "speaker": "Atsushi",
+      "text": "Je repense au livre. À ce fragment que j'ai perdu. Et à celui qui est venu s'asseoir à côté de moi ce soir.",
+      "pause": 600,
+      "music": "rain.mp3",
+      "next": "c3_s03"
+    },
+
+    "c3_s03": {
+      "id": "c3_s03",
+      "background": "yokohama_night.webp",
+      "character": null,
+      "speaker": null,
+      "text": "Selon l'affinité accumulée, quelqu'un de particulier est monté sur ce toit ce soir...",
+      "pause": 500,
+      "music": "rain.mp3",
+      "affinity_gate": {
+        "min_affection": 20,
+        "scenes": {
+          "Dazai":    "c3_s04_dazai",
+          "Kunikida": "c3_s04_kunikida",
+          "Ranpo":    "c3_s04_ranpo",
+          "Lucy":     "c3_s04_lucy",
+          "default":  "c3_s04_seul"
+        }
+      }
+    },
+
+    "c3_s04_dazai": {
+      "id": "c3_s04_dazai",
+      "background": "yokohama_night.webp",
+      "character": "dazaicasual1.png",
+      "speaker": "Dazai",
+      "text": "Toujours sur le toit quand tu réfléchis ? Tu ressembles de plus en plus à Odasaku.",
+      "pause": 600,
+      "music": "rain.mp3",
+      "next": "c3_s05_dazai"
+    },
+    "c3_s05_dazai": {
+      "id": "c3_s05_dazai",
+      "background": "yokohama_night.webp",
+      "character": "atsushi_casual.png",
+      "speaker": "Atsushi",
+      "text": "Qui est Odasaku ?",
+      "pause": 400,
+      "music": "rain.mp3",
+      "next": "c3_s06_dazai"
+    },
+    "c3_s06_dazai": {
+      "id": "c3_s06_dazai",
+      "background": "yokohama_night.webp",
+      "character": "dazaicasual2.png",
+      "speaker": "Dazai",
+      "text": "Quelqu'un que j'ai perdu. Et qui m'a appris que vivre avait une valeur. Ce soir, je voulais juste… ne pas être seul sur un toit.",
+      "pause": 800,
+      "music": "rain.mp3",
+      "next": "c3_s07"
+    },
+
+    "c3_s04_kunikida": {
+      "id": "c3_s04_kunikida",
+      "background": "yokohama_night.webp",
+      "character": "kunikidaserious.png",
+      "speaker": "Kunikida",
+      "text": "Je savais que tu serais là. J'ai apporté du thé. Tu as oublié de dîner.",
+      "pause": 600,
+      "music": "rain.mp3",
+      "next": "c3_s05_kunikida"
+    },
+    "c3_s05_kunikida": {
+      "id": "c3_s05_kunikida",
+      "background": "yokohama_night.webp",
+      "character": "atsushi_casual.png",
+      "speaker": "Atsushi",
+      "text": "Tu fais ça souvent, noter quand les gens mangent ?",
+      "pause": 400,
+      "music": "rain.mp3",
+      "next": "c3_s06_kunikida"
+    },
+    "c3_s06_kunikida": {
+      "id": "c3_s06_kunikida",
+      "background": "yokohama_night.webp",
+      "character": "kunikidaglasses.png",
+      "speaker": "Kunikida",
+      "text": "Seulement pour les membres de l'équipe qui ont tendance à s'effacer quand ça va mal. Bois ton thé.",
+      "pause": 700,
+      "music": "rain.mp3",
+      "next": "c3_s07"
+    },
+
+    "c3_s04_ranpo": {
+      "id": "c3_s04_ranpo",
+      "background": "yokohama_night.webp",
+      "character": "ranposerious.png",
+      "speaker": "Ranpo",
+      "text": "J'avais calculé que tu serais là avec une précision de cent pour cent. La pluie, le toit, exactement l'humeur qu'il te faut.",
+      "pause": 600,
+      "music": "rain.mp3",
+      "next": "c3_s05_ranpo"
+    },
+    "c3_s05_ranpo": {
+      "id": "c3_s05_ranpo",
+      "background": "yokohama_night.webp",
+      "character": "atsushi_casual.png",
+      "speaker": "Atsushi",
+      "text": "Tu es… venu exprès ?",
+      "pause": 400,
+      "music": "rain.mp3",
+      "next": "c3_s06_ranpo"
+    },
+    "c3_s06_ranpo": {
+      "id": "c3_s06_ranpo",
+      "background": "yokohama_night.webp",
+      "character": "ranpoglasses.png",
+      "speaker": "Ranpo",
+      "text": "Non. J'avais juste envie d'air frais. Le fait que tu sois là est une coïncidence que j'avais prévue.",
+      "pause": 700,
+      "music": "rain.mp3",
+      "next": "c3_s07"
+    },
+
+    "c3_s04_lucy": {
+      "id": "c3_s04_lucy",
+      "background": "yokohama_night.webp",
+      "character": "lucysmile.png",
+      "speaker": "Lucy",
+      "text": "T'es encore là à ruminer ? Pousse-toi. J'apporte du café.",
+      "pause": 500,
+      "music": "rain.mp3",
+      "next": "c3_s05_lucy"
+    },
+    "c3_s05_lucy": {
+      "id": "c3_s05_lucy",
+      "background": "yokohama_night.webp",
+      "character": "atsushi_casual.png",
+      "speaker": "Atsushi",
+      "text": "Tu travaillais encore à cette heure ?",
+      "pause": 400,
+      "music": "rain.mp3",
+      "next": "c3_s06_lucy"
+    },
+    "c3_s06_lucy": {
+      "id": "c3_s06_lucy",
+      "background": "yokohama_night.webp",
+      "character": "lucyspeak.png",
+      "speaker": "Lucy",
+      "text": "Je dors pas bien quand il pleut. Alors j'ai fait du café. Et je savais que tu avais pas dîné, espèce d'idiot.",
+      "pause": 600,
+      "music": "rain.mp3",
+      "next": "c3_s07"
+    },
+
+    "c3_s04_seul": {
+      "id": "c3_s04_seul",
+      "background": "yokohama_night.webp",
+      "character": null,
+      "speaker": null,
+      "text": "Personne ne monte sur le toit ce soir. La pluie tombe seule, et je l'écoute.",
+      "pause": 700,
+      "music": "rain.mp3",
+      "next": "c3_s07"
+    },
+
+    "c3_s07": {
+      "id": "c3_s07",
+      "background": "yokohama_night.webp",
+      "character": "atsushi_casual.png",
+      "speaker": "Atsushi",
+      "text": "La nuit de Yokohama. La pluie. Ce fragment de moi quelque part dans le livre. Et demain, on retourne dedans.",
+      "pause": 700,
+      "music": "rain.mp3",
+      "next": "c3_s08"
+    },
+
+    "c3_s08": {
+      "id": "c3_s08",
+      "background": "yokohama_night.webp",
+      "character": "atsushi_casual.png",
+      "speaker": "Atsushi",
+      "text": "Ce qui m'attend là-bas…",
+      "pause": 600,
+      "music": "rain.mp3",
+      "choices": [
+        {
+          "label": "Je dois faire confiance à l'équipe. On est plus forts ensemble.",
+          "affection_target": "Dazai",
+          "affection_delta": 5,
+          "next_scene": "c3_s09_equipe"
+        },
+        {
+          "label": "Je dois me préparer mentalement. Personne ne peut faire ça à ma place.",
+          "next_scene": "c3_s09_seul"
+        }
+      ]
+    },
+
+    "c3_s09_equipe": {
+      "id": "c3_s09_equipe",
+      "background": "yokohama_night.webp",
+      "character": null,
+      "speaker": null,
+      "text": "Je ferme les yeux. Demain, on y va ensemble.",
+      "pause": 600,
+      "music": "rain.mp3",
+      "next": "c3_s10"
+    },
+    "c3_s09_seul": {
+      "id": "c3_s09_seul",
+      "background": "yokohama_night.webp",
+      "character": null,
+      "speaker": null,
+      "text": "Je ferme les yeux. Demain, c'est moi qui dois être prêt.",
+      "pause": 600,
+      "music": "rain.mp3",
+      "next": "c3_s10"
+    },
+
+    "c3_s10": {
+      "id": "c3_s10",
+      "background": "yokohama_night.webp",
+      "character": null,
+      "speaker": null,
+      "text": "La pluie continue. Yokohama respire.",
+      "pause": 800,
+      "music": "rain.mp3"
+    }
+  }
+}

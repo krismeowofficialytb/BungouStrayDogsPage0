@@ -1,21 +1,334 @@
 {
   "chapter": 2,
-  "title": "Le rendez‑vous",
-  "subtitle": "bientôt",
+  "title": "L'Œil du Livre",
   "type": "main",
   "thumbnail": "images/thumbnails/ch2.jpg",
   "start": "c2_s01",
-  "love_interests": ["dazai", "kunikida", "akutagawa", "ranpo"],
+
+  "love_interests": ["Dazai", "Kunikida", "Ranpo", "Lucy", "Atsushi", "Chuuya", "Akutagawa"],
+
   "scenes": {
+
     "c2_s01": {
       "id": "c2_s01",
-      "background": "black.jpg",
+      "background": "hospital.webp",
       "character": null,
       "speaker": null,
-      "text": "",
-      "pause": 100,
-      "music": null,
-      "next": null
+      "text": "Je me réveille dans une pièce blanche. L'odeur d'antiseptique. Je suis à l'infirmerie de l'Agence.",
+      "pause": 700,
+      "music": "calm.mp3",
+      "next": "c2_s02"
+    },
+
+    "c2_s02": {
+      "id": "c2_s02",
+      "background": "hospital.webp",
+      "character": null,
+      "speaker": "Atsushi",
+      "text": "Ma tête tourne encore. Le livre… je l'ai touché. Qu'est-ce qui s'est passé ?",
+      "pause": 600,
+      "music": "calm.mp3",
+      "next": "c2_s03"
+    },
+
+    "c2_s03": {
+      "id": "c2_s03",
+      "background": "hospital.webp",
+      "character": "dazaicasual1.png",
+      "speaker": "Dazai",
+      "text": "Tu es réveillé, Atsushi-kun. Tu as dormi dix heures. Le livre t'a… aspiré quelque chose.",
+      "pause": 600,
+      "music": "calm.mp3",
+      "next": "c2_s04"
+    },
+
+    "c2_s04": {
+      "id": "c2_s04",
+      "background": "hospital.webp",
+      "character": "atsushi_casual.png",
+      "speaker": "Atsushi",
+      "text": "Aspir… quoi exactement ?",
+      "pause": 400,
+      "music": "calm.mp3",
+      "next": "c2_s05"
+    },
+
+    "c2_s05": {
+      "id": "c2_s05",
+      "background": "hospital.webp",
+      "character": "dazaicasual2.png",
+      "speaker": "Dazai",
+      "text": "Ranpo pense que c'est un fragment de ta mémoire. Ou peut-être… quelque chose d'autre.",
+      "pause": 700,
+      "music": "calm.mp3",
+      "next": "c2_s06"
+    },
+
+    "c2_s06": {
+      "id": "c2_s06",
+      "background": "hospital.webp",
+      "character": "atsushi_casual.png",
+      "speaker": "Atsushi",
+      "text": "Comment je me sens ? Honnêtement…",
+      "pause": 500,
+      "music": "calm.mp3",
+      "choices": [
+        {
+          "label": "Je me sens étrangement serein. Comme si quelque chose de lourd était parti.",
+          "affection_target": "Dazai",
+          "affection_delta": 5,
+          "next_scene": "c2_s07_a"
+        },
+        {
+          "label": "J'ai peur. Ce vide dans ma mémoire me terrorise.",
+          "affection_target": "Kunikida",
+          "affection_delta": 3,
+          "next_scene": "c2_s07_b"
+        },
+        {
+          "label": "Je ne sais pas encore. J'ai besoin de temps pour réfléchir.",
+          "next_scene": "c2_s07_c"
+        }
+      ]
+    },
+
+    "c2_s07_a": {
+      "id": "c2_s07_a",
+      "background": "hospital.webp",
+      "character": "dazaicasual1.png",
+      "speaker": "Dazai",
+      "text": "Sérénité face à la perte… c'est soit de la sagesse, soit du déni. Dans ton cas, je parie sur les deux.",
+      "pause": 600,
+      "music": "calm.mp3",
+      "next": "c2_s08"
+    },
+    "c2_s07_b": {
+      "id": "c2_s07_b",
+      "background": "hospital.webp",
+      "character": "kunikidaserious.png",
+      "speaker": "Kunikida",
+      "text": "C'est normal d'avoir peur. Mais l'Agence est là. Nous allons récupérer ce qui t'appartient.",
+      "pause": 600,
+      "music": "calm.mp3",
+      "next": "c2_s08"
+    },
+    "c2_s07_c": {
+      "id": "c2_s07_c",
+      "background": "hospital.webp",
+      "character": null,
+      "speaker": null,
+      "text": "Le silence entre nous s'étire. Dazai ne dit rien non plus. C'est presque confortable.",
+      "pause": 600,
+      "music": "calm.mp3",
+      "next": "c2_s08"
+    },
+
+    "c2_s08": {
+      "id": "c2_s08",
+      "background": "hospital.webp",
+      "character": "ranposerious.png",
+      "speaker": "Ranpo",
+      "text": "Le livre est au coffre de l'Agence. Mais Kaito… a disparu.",
+      "pause": 600,
+      "music": "serious.mp3",
+      "next": "c2_s09"
+    },
+
+    "c2_s09": {
+      "id": "c2_s09",
+      "background": "hospital.webp",
+      "character": "atsushi_casual.png",
+      "speaker": "Atsushi",
+      "text": "Kaito s'est enfui ? Avec les flics dehors ?",
+      "pause": 400,
+      "music": "serious.mp3",
+      "next": "c2_s10"
+    },
+
+    "c2_s10": {
+      "id": "c2_s10",
+      "background": "hospital.webp",
+      "character": "ranporead.png",
+      "speaker": "Ranpo",
+      "text": "Non. Il n'est pas sorti par la porte. Il a simplement… cessé d'exister dans l'entrepôt. Comme si le livre l'avait pris.",
+      "pause": 700,
+      "music": "serious.mp3",
+      "next": "c2_s11"
+    },
+
+    "c2_s11": {
+      "id": "c2_s11",
+      "background": "salleprincipale.png",
+      "character": null,
+      "speaker": null,
+      "text": "Quelques heures plus tard. Salle principale. Nous sommes tous là, autour de la table. Le coffre est ouvert, le livre posé sous vitrine. Je sens quelque chose en l'observant.",
+      "pause": 700,
+      "music": "littletense.mp3",
+      "next": "c2_s12"
+    },
+
+    "c2_s12": {
+      "id": "c2_s12",
+      "background": "salleprincipale.png",
+      "character": "atsushi_casual.png",
+      "speaker": "Atsushi",
+      "text": "Je dois parler à quelqu'un de ce que j'ai ressenti quand j'ai tenu ce livre. Mais à qui ?",
+      "pause": 600,
+      "music": "littletense.mp3",
+      "choices": [
+        {
+          "label": "Parler à Dazai. Il comprend les choses obscures mieux que quiconque.",
+          "affection_target": "Dazai",
+          "affection_delta": 8,
+          "next_scene": "c2_s13_dazai"
+        },
+        {
+          "label": "Parler à Kunikida. Il gardera les pieds sur terre.",
+          "affection_target": "Kunikida",
+          "affection_delta": 8,
+          "next_scene": "c2_s13_kunikida"
+        },
+        {
+          "label": "Parler à Ranpo. Si quelqu'un peut décoder ce que j'ai vu, c'est lui.",
+          "affection_target": "Ranpo",
+          "affection_delta": 8,
+          "next_scene": "c2_s13_ranpo"
+        },
+        {
+          "label": "Garder ça pour moi. Ce n'est pas le moment.",
+          "next_scene": "c2_s14"
+        }
+      ]
+    },
+
+    "c2_s13_dazai": {
+      "id": "c2_s13_dazai",
+      "background": "salleprincipale.png",
+      "character": "dazaicasual2.png",
+      "speaker": "Dazai",
+      "text": "Ce que tu as vu dans le livre… c'était réel, Atsushi-kun. Pas une hallucination. Le livre lit ceux qui le lisent.",
+      "pause": 700,
+      "music": "littletense.mp3",
+      "next": "c2_s14"
+    },
+    "c2_s13_kunikida": {
+      "id": "c2_s13_kunikida",
+      "background": "salleprincipale.png",
+      "character": "kunikidaglasses.png",
+      "speaker": "Kunikida",
+      "text": "Je vais noter tout ça dans mon rapport. Ce n'est pas de la faiblesse de l'admettre, Nakajima. C'est de la rigueur.",
+      "pause": 700,
+      "music": "littletense.mp3",
+      "next": "c2_s14"
+    },
+    "c2_s13_ranpo": {
+      "id": "c2_s13_ranpo",
+      "background": "salleprincipale.png",
+      "character": "ranpothink.png",
+      "speaker": "Ranpo",
+      "text": "Mmmh. Si ce que tu décris est exact, le livre n'est pas un outil. C'est une entité. Et elle t'a choisi pour une raison.",
+      "pause": 700,
+      "music": "littletense.mp3",
+      "next": "c2_s14"
+    },
+
+    "c2_s14": {
+      "id": "c2_s14",
+      "background": "salleprincipale.png",
+      "character": null,
+      "speaker": null,
+      "text": "La réunion reprend. Kunikida trace quelques pistes sur le tableau. Il reste beaucoup de questions sans réponse.",
+      "pause": 600,
+      "music": "littletense.mp3",
+      "next": "c2_s15"
+    },
+
+    "c2_s15": {
+      "id": "c2_s15",
+      "background": "salleprincipale.png",
+      "character": "kunikidaglasses.png",
+      "speaker": "Kunikida",
+      "text": "Pour l'instant, le livre reste ici, sous surveillance. Mais si Kaito est vraiment dans le livre… il faudra y retourner.",
+      "pause": 700,
+      "music": "littletense.mp3",
+      "next": "c2_s16"
+    },
+
+    "c2_s16": {
+      "id": "c2_s16",
+      "background": "salleprincipale.png",
+      "character": "atsushi_casual.png",
+      "speaker": "Atsushi",
+      "text": "Je suis prêt à y retourner si nécessaire.",
+      "pause": 500,
+      "music": "littletense.mp3",
+      "choices": [
+        {
+          "label": "Mais j'aimerais ne pas y aller seul.",
+          "affection_target": "Dazai",
+          "affection_delta": 6,
+          "next_scene": "c2_s17_duo"
+        },
+        {
+          "label": "J'ai besoin de m'entraîner d'abord. Je ne veux pas être un fardeau.",
+          "affection_target": "Kunikida",
+          "affection_delta": 4,
+          "next_scene": "c2_s17_solo"
+        }
+      ]
+    },
+
+    "c2_s17_duo": {
+      "id": "c2_s17_duo",
+      "background": "salleprincipale.png",
+      "character": "dazaicasual1.png",
+      "speaker": "Dazai",
+      "text": "Bien sûr que tu n'iras pas seul. Ce serait du gâchis. Je t'accompagne.",
+      "pause": 600,
+      "music": "littletense.mp3",
+      "next": "c2_s18"
+    },
+    "c2_s17_solo": {
+      "id": "c2_s17_solo",
+      "background": "salleprincipale.png",
+      "character": "kunikidaserious.png",
+      "speaker": "Kunikida",
+      "text": "C'est une bonne décision. Je peux t'aider à t'entraîner. Demain matin, six heures.",
+      "pause": 600,
+      "music": "littletense.mp3",
+      "next": "c2_s18"
+    },
+
+    "c2_s18": {
+      "id": "c2_s18",
+      "background": "corridor.png",
+      "character": null,
+      "speaker": null,
+      "text": "La réunion se termine. Tout le monde se disperse. Je reste un moment dans le couloir, à regarder la vitrine où repose le livre de Mérenrê II.",
+      "pause": 600,
+      "music": "calm.mp3",
+      "next": "c2_s19"
+    },
+
+    "c2_s19": {
+      "id": "c2_s19",
+      "background": "corridor.png",
+      "character": "atsushi_casual.png",
+      "speaker": "Atsushi",
+      "text": "Une chose est sûre : ce livre n'a pas fini de parler.",
+      "pause": 600,
+      "music": "calm.mp3",
+      "next": "c2_s20"
+    },
+
+    "c2_s20": {
+      "id": "c2_s20",
+      "background": "corridor.png",
+      "character": null,
+      "speaker": null,
+      "text": "FIN DU CHAPITRE 2.",
+      "pause": 1000,
+      "music": "calm.mp3"
     }
   }
 }

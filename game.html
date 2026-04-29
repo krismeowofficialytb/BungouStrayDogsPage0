@@ -28,6 +28,7 @@
 @keyframes spkSlide  {from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:translateX(0)}}
 @keyframes popIn     {0%{opacity:0;transform:translate(-50%,-50%) scale(.87)}70%{transform:translate(-50%,-50%) scale(1.03)}100%{opacity:1;transform:translate(-50%,-50%) scale(1)}}
 @keyframes backPop   {0%{transform:scale(1)}50%{transform:scale(.93)}100%{transform:scale(1)}}
+@keyframes khepryPop {0%{opacity:0;transform:translateY(30px) scale(.8)}60%{opacity:1;transform:translateY(-5px) scale(1.05)}100%{opacity:1;transform:translateY(0) scale(1)}}
 
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
@@ -48,20 +49,9 @@ button{cursor:pointer;font-family:'Rajdhani',sans-serif;border:none;background:n
 .vignette{position:absolute;inset:0;z-index:4;pointer-events:none;box-shadow:inset 0 0 150px 60px rgba(0,0,0,.65)}
 
 /* ── CHARACTERS ── */
-/* Le pied est à bottom:0 (bas de l'écran).
-   #dialog-area a z-index:12 et fond opaque → il recouvre le bas du perso.
-   Résultat : le perso semble collé exactement au bord du dialogue, sans JS. */
 #char-l,#char-r,#char-c{
-  position:absolute;
-  bottom:0;
-  z-index:6;
-  pointer-events:none;
-  transition:opacity .4s;
-  height:80%;
-  max-height:80%;
-  width:auto;
-  object-fit:contain;
-  object-position:bottom center;
+  position:absolute;bottom:0;z-index:6;pointer-events:none;transition:opacity .4s;
+  height:80%;max-height:80%;width:auto;object-fit:contain;object-position:bottom center;
 }
 #char-l{left:5%;animation:charL .4s ease both}
 #char-r{right:5%;animation:charR .4s ease both}
@@ -70,7 +60,8 @@ button{cursor:pointer;font-family:'Rajdhani',sans-serif;border:none;background:n
 /* ── GAUGES ── */
 #gauges{position:absolute;left:14px;top:50%;transform:translateY(-50%);z-index:10;display:flex;flex-direction:column;gap:14px}
 .g-item{display:flex;flex-direction:column;align-items:center;gap:5px;animation:fadeIn .5s ease both}
-.g-ava-ph{width:38px;height:38px;border-radius:50%;border:1px solid var(--border);background:rgba(60,15,15,.6);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--red);font-family:'Cinzel Decorative',serif;font-weight:700}
+.g-ava-ph{width:38px;height:38px;border-radius:50%;border:1px solid var(--border);background:rgba(60,15,15,.6);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--red);font-family:'Cinzel Decorative',serif;font-weight:700;position:relative}
+.g-khepry{position:absolute;top:-4px;right:-4px;font-size:11px;display:none}
 .g-bar{width:10px;height:90px;background:rgba(255,255,255,.06);border:1px solid var(--border2);border-radius:5px;overflow:hidden;position:relative}
 .g-fill{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(to top,#8b3a3a,#c8524a,#e8827a);border-radius:5px;transition:height .7s cubic-bezier(.34,1.56,.64,1);animation:jGlow 3s ease-in-out infinite}
 .g-heart{font-size:14px;filter:drop-shadow(0 0 3px rgba(200,50,50,.5))}
@@ -88,7 +79,6 @@ button{cursor:pointer;font-family:'Rajdhani',sans-serif;border:none;background:n
 #dialog-area{
   position:absolute;bottom:0;left:0;right:0;z-index:12;
   padding:0 60px 20px;
-  /* Fond dégradé du bas vers transparent : masque le bas du perso qui dépasse sous #dbox */
   background:linear-gradient(to top, #0a0608 60%, transparent 100%);
 }
 #dialog-header{display:flex;align-items:flex-end;gap:10px;margin-bottom:0}
@@ -111,20 +101,17 @@ button{cursor:pointer;font-family:'Rajdhani',sans-serif;border:none;background:n
 
 /* ── CHOICES ── */
 #choices{
-  position:absolute;
-  left:50%;transform:translateX(-50%);
-  z-index:20;
-  width:calc(100% - 120px);
-  max-width:560px;
-  display:flex;flex-direction:column;gap:9px;
-  pointer-events:all;
-  /* Position calculée dynamiquement via JS, valeur par défaut : */
-  bottom: 185px;
+  position:absolute;left:50%;transform:translateX(-50%);z-index:20;
+  width:calc(100% - 120px);max-width:560px;display:flex;flex-direction:column;gap:9px;
+  pointer-events:all;bottom:185px;
 }
 .cbtn{background:rgba(30,10,10,.92);border:1px solid var(--border2);border-radius:9px;color:var(--cream);padding:12px 20px;font-family:'Rajdhani',sans-serif;font-size:15px;letter-spacing:.5px;backdrop-filter:blur(8px);transition:all .25s;text-align:left;animation:cPulse 3s ease-in-out infinite;position:relative;overflow:hidden;width:100%}
 .cbtn::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:linear-gradient(to bottom,var(--red),var(--red2));border-radius:3px 0 0 3px;opacity:0;transition:opacity .2s}
 .cbtn:hover{background:rgba(80,20,20,.78);border-color:rgba(220,80,80,.55);transform:translateX(4px)}
 .cbtn:hover::before{opacity:1}
+.cbtn .aff-hint{font-size:11px;opacity:.55;letter-spacing:1px;margin-left:6px}
+.cbtn .aff-hint.pos{color:#ff9090}
+.cbtn .aff-hint.neg{color:#90b0ff}
 
 /* ── CHAPTER INTRO ── */
 #ch-intro{position:fixed;inset:0;z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(10,6,8,.97);backdrop-filter:blur(8px);text-align:center;padding:30px}
@@ -169,8 +156,8 @@ button{cursor:pointer;font-family:'Rajdhani',sans-serif;border:none;background:n
 .hclose{display:block;margin:8px auto 0;background:rgba(200,82,74,.25);border:1px solid var(--border);border-radius:9px;padding:10px 30px;color:var(--cream);font-size:13px;letter-spacing:2px;text-transform:uppercase;transition:all .2s}
 .hclose:hover{background:rgba(200,82,74,.45)}
 
-/* ── ENDING (dernier chapitre seulement) ── */
-#ending-ov{position:fixed;inset:0;z-index:190;background:rgba(10,6,8,.97);display:none;align-items:center;justify-content:center;flex-direction:column;gap:20px;text-align:center;padding:40px}
+/* ── ENDING ── */
+#ending-ov{position:fixed;inset:0;z-index:190;background:rgba(10,6,8,.97);display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px;text-align:center;padding:40px}
 #ending-ov .end-tag{font-family:'Rajdhani',sans-serif;font-size:11px;letter-spacing:5px;text-transform:uppercase;color:var(--red);animation:chSub 1s .3s ease both;opacity:0}
 #ending-ov h1{font-family:'Cinzel Decorative',serif;font-size:clamp(1.4rem,4vw,2.6rem);color:var(--cream);letter-spacing:.1em;text-shadow:0 0 40px rgba(200,50,50,.5);animation:chReveal 1.5s .7s ease both;opacity:0;max-width:600px}
 #ending-ov p{font-family:'IM Fell English',serif;font-style:italic;font-size:15px;color:var(--cream);opacity:0;animation:chSub 1s 1.8s ease both;max-width:480px;line-height:1.75}
@@ -179,34 +166,35 @@ button{cursor:pointer;font-family:'Rajdhani',sans-serif;border:none;background:n
 .ebtn.primary{background:rgba(200,82,74,.25);border-color:var(--red)}
 .ebtn.primary:hover{background:rgba(200,82,74,.5)}
 
+/* ── KHEPRY NOTIFICATION ── */
+#khepry-notif{
+  position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);
+  z-index:210;background:rgba(10,6,8,.97);border:1px solid var(--red);
+  border-radius:16px;padding:36px 48px;text-align:center;
+  display:none;flex-direction:column;align-items:center;gap:14px;
+  max-width:380px;width:90%;
+  animation:khepryPop .6s ease both;
+  box-shadow:0 0 60px rgba(200,82,74,.3);
+}
+#khepry-notif .kh-sym{font-size:48px;line-height:1}
+#khepry-notif h3{font-family:'Cinzel Decorative',serif;font-size:1.1rem;letter-spacing:2px;color:var(--red)}
+#khepry-notif p{font-family:'IM Fell English',serif;font-style:italic;font-size:14px;color:var(--cream);opacity:.8;line-height:1.6}
+#khepry-notif button{margin-top:8px;padding:10px 30px;background:rgba(200,82,74,.25);border:1px solid var(--border);border-radius:9px;color:var(--cream);font-size:13px;letter-spacing:2px;text-transform:uppercase;transition:all .2s}
+#khepry-notif button:hover{background:rgba(200,82,74,.5)}
+
 /* ── TOAST ── */
 #toast{position:fixed;top:68px;left:50%;transform:translateX(-50%);background:rgba(10,6,8,.93);border:1px solid var(--border);border-radius:8px;padding:7px 18px;font-size:12px;letter-spacing:2px;color:var(--cream);z-index:200;opacity:0;pointer-events:none;transition:opacity .3s;backdrop-filter:blur(6px);white-space:nowrap}
 #mode-ind{position:absolute;top:55px;left:50%;transform:translateX(-50%);z-index:14;font-family:'Rajdhani',sans-serif;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--red);background:rgba(10,6,8,.7);border:1px solid var(--border2);border-radius:4px;padding:3px 10px;display:none;backdrop-filter:blur(4px)}
 
-/* ────────────────────────────────
-   RESPONSIVE MOBILE
-   Tout repose sur --char-bottom et
-   --choices-bottom calculés en JS
-   selon la hauteur réelle de #dialog-area.
-──────────────────────────────── */
 @media(max-width:600px){
   #dialog-area{padding:0 8px 10px}
   #dbox{padding:12px 12px 16px;border-radius:0 10px 10px 10px}
   #dtxt{font-size:14px;line-height:1.55}
   #spk{font-size:10px;padding:4px 10px 5px;letter-spacing:1px}
   #btn-back{font-size:9px;padding:4px 8px 5px;letter-spacing:1px}
-  /* Choix : pleine largeur avec marges */
   #choices{width:calc(100% - 16px)!important;left:8px!important;transform:none!important;padding:0!important}
   .cbtn{font-size:13px;padding:10px 12px;letter-spacing:.3px}
-  /* Personnages mobile : très grands */
-  #char-l,#char-r,#char-c{
-    left:50%!important;right:auto!important;
-    transform:translateX(-50%)!important;
-    height:95vh!important;
-    max-height:95vh!important;
-    max-width:160vw!important;
-    width:auto!important;
-  }
+  #char-l,#char-r,#char-c{left:50%!important;right:auto!important;transform:translateX(-50%)!important;height:95vh!important;max-height:95vh!important;max-width:160vw!important;width:auto!important;}
   #gauges{left:3px;gap:8px}
   .g-bar{height:60px;width:8px}
   .g-ava-ph{width:28px;height:28px;font-size:8px}
@@ -309,59 +297,136 @@ button{cursor:pointer;font-family:'Rajdhani',sans-serif;border:none;background:n
     <p class="h-tag">Une expérience otome inspirée de Bungou Stray Dogs.</p>
     <div class="h-sec">
       <h3>Avancer dans l'histoire</h3>
-      <ul><li>Clique sur la <strong>boîte de dialogue</strong> pour avancer.</li><li>Cliquer pendant le texte le <strong>complète instantanément</strong>.</li><li>Utilise <strong>Espace / Entrée / →</strong> au clavier. ← ou le bouton <strong>Revenir</strong> pour reculer.</li><li>Appuie sur <strong>A</strong> pour le mode Auto.</li></ul>
+      <ul>
+        <li>Clique sur la <strong>boîte de dialogue</strong> pour avancer.</li>
+        <li>Cliquer pendant le texte le <strong>complète instantanément</strong>.</li>
+        <li>Utilise <strong>Espace / Entrée / →</strong> au clavier. ← ou le bouton <strong>Revenir</strong> pour reculer.</li>
+        <li>Appuie sur <strong>A</strong> pour le mode Auto.</li>
+      </ul>
     </div>
     <div class="h-sec">
       <h3>Choix &amp; Affinité</h3>
-      <ul><li>Tes choix influencent l'affinité avec chaque personnage.</li><li>Les jauges à gauche suivent tes relations en temps réel.</li></ul>
+      <ul>
+        <li>Tes choix influencent l'affinité avec chaque personnage (jauges à gauche).</li>
+        <li>Certaines scènes s'adaptent selon qui a l'affinité la plus haute.</li>
+        <li>Une fois un <strong>Khepry</strong> obtenu avec un personnage, il est conservé même si tu rejoues.</li>
+      </ul>
+    </div>
+    <div class="h-sec">
+      <h3>Endings</h3>
+      <ul>
+        <li>À la fin du dernier chapitre, le personnage avec l'affinité la plus haute détermine ton ending.</li>
+        <li>Un Khepry est attribué si l'affinité dépasse le seuil requis.</li>
+        <li>Rejouer remet l'affinité à zéro, mais <strong>conserve</strong> les Khepry déjà obtenus.</li>
+        <li>On ne peut obtenir <strong>qu'un seul Khepry</strong> par personnage.</li>
+      </ul>
     </div>
     <div class="h-sec">
       <h3>Sauvegarde</h3>
-      <ul><li>Clique sur 💾 pour sauvegarder à tout moment.</li><li>La progression est stockée localement dans ton navigateur.</li></ul>
+      <ul><li>Clique sur 💾 pour sauvegarder à tout moment.</li></ul>
     </div>
     <button class="hclose" onclick="closeHelp()">Compris ✓</button>
   </div>
 </div>
 
-<!-- Ending : affiché uniquement à la fin du dernier chapitre -->
 <div id="ending-ov">
   <div class="end-tag" id="ending-tag">✦ Fin</div>
   <h1 id="ending-title"></h1>
   <p id="ending-desc"></p>
-  <div style="margin-top:20px;animation:chSub 1s 2.6s ease both;opacity:0;display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
-    <button class="ebtn primary" onclick="goMenu()">🏠 Menu principal</button>
+  <div id="ending-btns" style="margin-top:20px;animation:chSub 1s 2.6s ease both;opacity:0;display:flex;gap:12px;flex-wrap:wrap;justify-content:center">
+    <button class="ebtn primary" onclick="restartGame()">↺ Rejouer</button>
+    <button class="ebtn" onclick="goMenu()">🏠 Menu principal</button>
   </div>
+</div>
+
+<!-- Notification Khepry -->
+<div id="khepry-notif">
+  <div class="kh-sym">𓆣</div>
+  <h3 id="kh-title">Khepry obtenu !</h3>
+  <p id="kh-desc"></p>
+  <button onclick="closeKhepryNotif()">Continuer</button>
 </div>
 
 <div id="toast"></div>
 
 <script>
-/* ── GAME VARS ── */
+/* ════════════════════════════════════════════
+   CONSTANTES DE CONFIGURATION
+   ════════════════════════════════════════════
+   SEUIL_KHEPRY : affinité minimale pour obtenir un Khepry à la fin.
+   Les personnages valides sont listés dans love_interests du JSON de chapitre.
+   Pour les endings neutres, créer un fichier ending_neutral.json.
+*/
+const SEUIL_KHEPRY_DEFAULT = 60;  // Seuil par défaut si non défini dans le JSON d'ending
+
+/* ════════════════════════════════════════════
+   GAME VARS (variables de scénario)
+   ════════════════════════════════════════════ */
 let gameVars = {};
 function setGameVar(k,v){gameVars[k]=v;}
 function getGameVar(k,d=null){return gameVars.hasOwnProperty(k)?gameVars[k]:d;}
 
-/* ── SAVE ── */
-const SAVE_KEY="otome_save_v2";
-function defaultSave(){return{unlockedChapters:[1],currentChapter:1,currentSceneId:null,affection:{}};}
+/* ════════════════════════════════════════════
+   SAVE — deux couches :
+   - save       : progression actuelle (affinité, chapitre, scène)
+   - persistent : données inter-runs (Khepry gagnés)
+   ════════════════════════════════════════════ */
+const SAVE_KEY       = "otome_save_v3";
+const PERSISTENT_KEY = "otome_persistent_v1";
+
+function defaultSave(){
+  return {
+    unlockedChapters:[1],
+    currentChapter:1,
+    currentSceneId:null,
+    affection:{},      // {Dazai:40, Kunikida:-10, ...}
+    gameVars:{}
+  };
+}
+function defaultPersistent(){
+  return {
+    khepry:{}   // {Dazai:true, Lucy:true} — un seul par perso, jamais réinitialisé
+  };
+}
+
 function loadSave(){
   const r=localStorage.getItem(SAVE_KEY);
   if(!r)return defaultSave();
-  try{const s=JSON.parse(r);if(!s.affection)s.affection={};return s;}
+  try{const s=JSON.parse(r);if(!s.affection)s.affection={};if(!s.gameVars)s.gameVars={};return s;}
   catch{localStorage.removeItem(SAVE_KEY);return defaultSave();}
 }
+function loadPersistent(){
+  const r=localStorage.getItem(PERSISTENT_KEY);
+  if(!r)return defaultPersistent();
+  try{return JSON.parse(r);}
+  catch{return defaultPersistent();}
+}
 function persistSave(){localStorage.setItem(SAVE_KEY,JSON.stringify(save));}
+function persistData(){localStorage.setItem(PERSISTENT_KEY,JSON.stringify(persistent));}
+
 function updateProgress(){
-  save.currentChapter=currentChapter;save.currentSceneId=currentSceneId;
+  save.currentChapter=currentChapter;
+  save.currentSceneId=currentSceneId;
+  save.gameVars=gameVars;
   if(!save.unlockedChapters.includes(currentChapter))save.unlockedChapters.push(currentChapter);
   persistSave();
 }
 
-/* ── ÉTAT ── */
-let chData=null,currentChapter=1,currentSceneId=null,sceneHistory=[],save=loadSave();
-let isTyping=false,typeTimer=null,autoMode=false,autoTimer=null,pendingLeave=null,introSkip=false;
+/* ════════════════════════════════════════════
+   ÉTAT GLOBAL
+   ════════════════════════════════════════════ */
+let chData=null, currentChapter=1, currentSceneId=null, sceneHistory=[], isEnding=false;
+let save=loadSave(), persistent=loadPersistent();
+let isTyping=false, typeTimer=null, autoMode=false, autoTimer=null, pendingLeave=null, introSkip=false;
+let liNames=[];   // liste des love interests du chapitre courant
+let khepryNotifCallback=null;
 
-/* ── AUDIO ── */
+/* Restaurer gameVars depuis la sauvegarde */
+if(save.gameVars)gameVars=Object.assign({},save.gameVars);
+
+/* ════════════════════════════════════════════
+   AUDIO
+   ════════════════════════════════════════════ */
 const musicEl=document.getElementById("music");
 let lastMusicSrc="";
 function playMusic(src){
@@ -369,8 +434,9 @@ function playMusic(src){
   const p=src.includes("/")?src:"music/"+src;
   if(lastMusicSrc===p&&!musicEl.paused)return;
   lastMusicSrc=p;musicEl.src=p;musicEl.loop=true;
-  if(typeof getGlobalMuted!=='undefined'){musicEl.volume=getGlobalMuted()?0:getGlobalVolume();}
-  else{const vol=parseFloat(localStorage.getItem("game_volume")??"0.5");const mute=localStorage.getItem("game_mute")==="true";musicEl.volume=mute?0:vol;}
+  const vol=parseFloat(localStorage.getItem("game_volume")??"0.5");
+  const mute=localStorage.getItem("game_mute")==="true";
+  musicEl.volume=mute?0:vol;
   musicEl.play().catch(()=>{});
 }
 window.addEventListener('storage',(e)=>{
@@ -381,7 +447,9 @@ window.addEventListener('storage',(e)=>{
   }
 });
 
-/* ── BG ── */
+/* ════════════════════════════════════════════
+   BACKGROUND
+   ════════════════════════════════════════════ */
 let lastBg="";
 function setBg(src){
   if(!src)return;
@@ -392,7 +460,9 @@ function setBg(src){
   nxt.onload=()=>{nxt.style.transition="opacity .8s ease";nxt.style.opacity="1";setTimeout(()=>{cur.src=p;nxt.style.opacity="0";nxt.style.transition="none";},860);};
 }
 
-/* ── CHARS ── */
+/* ════════════════════════════════════════════
+   CHARACTERS
+   ════════════════════════════════════════════ */
 function setChars(scene){
   ["char-l","char-r","char-c"].forEach(id=>{const e=document.getElementById(id);e.style.display="none";e.src="";});
   if(!scene.character||scene.character==="null")return;
@@ -406,40 +476,51 @@ function setChars(scene){
   repositionCharsAndChoices();
 }
 
-/* ── REPOSITIONNEMENT CHOIX ── */
 function repositionCharsAndChoices(){
-  const dialogArea = document.getElementById("dialog-area");
-  const choicesEl  = document.getElementById("choices");
-  const dh = dialogArea.offsetHeight || 180;
-  // Seulement les choix à positionner — les persos sont à bottom:0 sous le dialogue
-  choicesEl.style.bottom = (dh + 10) + "px";
+  const dialogArea=document.getElementById("dialog-area");
+  const choicesEl=document.getElementById("choices");
+  const dh=dialogArea.offsetHeight||180;
+  choicesEl.style.bottom=(dh+10)+"px";
 }
+window.addEventListener("resize",repositionCharsAndChoices);
 
-window.addEventListener("resize", repositionCharsAndChoices);
-
-/* ── GAUGES ── */
-let liNames=[];
+/* ════════════════════════════════════════════
+   GAUGES — affinité visuelle
+   ════════════════════════════════════════════ */
 function initGauges(scenesObj){
   const found={};
   (chData.love_interests||[]).forEach(n=>{found[n]=null;});
-  for(const sid in scenesObj){const s=scenesObj[sid];if(s.choices)s.choices.forEach(c=>{if(c.affection_target)found[c.affection_target]=null;});}
-  liNames=Object.keys(found);renderGauges();
+  for(const sid in scenesObj){
+    const s=scenesObj[sid];
+    if(s.choices)s.choices.forEach(c=>{if(c.affection_target)found[c.affection_target]=null;});
+  }
+  liNames=Object.keys(found);
+  renderGauges();
 }
+
 function renderGauges(){
   const container=document.getElementById("gauges");container.innerHTML="";
   liNames.forEach(name=>{
     const v=Math.min(100,Math.max(0,save.affection[name]??0));
+    const hasKhepry=persistent.khepry[name]===true;
     const item=document.createElement("div");item.className="g-item";
-    const ava=document.createElement("div");ava.className="g-ava-ph";ava.textContent=name.charAt(0).toUpperCase();
+    const ava=document.createElement("div");ava.className="g-ava-ph";
+    ava.textContent=name.charAt(0).toUpperCase();
+    // Badge Khepry
+    const badge=document.createElement("div");badge.className="g-khepry";badge.textContent="𓆣";
+    if(hasKhepry)badge.style.display="block";
+    ava.appendChild(badge);
     const wrap=document.createElement("div");wrap.className="g-bar";
     const fill=document.createElement("div");fill.className="g-fill";fill.style.height=v+"%";
     wrap.appendChild(fill);
     const heart=document.createElement("div");heart.className="g-heart";
     heart.textContent=v>=100?"💖":v>=60?"❤️":v>=30?"🧡":"🤍";
     const lbl=document.createElement("div");lbl.className="g-lbl";lbl.textContent=name;
-    item.append(ava,wrap,heart,lbl);container.appendChild(item);
+    item.append(ava,wrap,heart,lbl);
+    container.appendChild(item);
   });
 }
+
 function applyAffection(target,delta){
   if(!target||delta===undefined)return;
   save.affection[target]=Math.min(100,Math.max(-100,(save.affection[target]??0)+delta));
@@ -455,6 +536,7 @@ function applyAffection(target,delta){
   }
   showPointPopup(target,delta);
 }
+
 function showPointPopup(target,delta){
   const items=document.querySelectorAll(".g-item");let rect=null;
   for(let i=0;i<items.length;i++){if(liNames[i]===target){rect=items[i].querySelector(".g-fill")?.getBoundingClientRect();break;}}
@@ -465,151 +547,366 @@ function showPointPopup(target,delta){
   document.body.appendChild(pop);setTimeout(()=>pop.remove(),1300);
 }
 
-/* ── TYPEWRITE ── */
+/* ════════════════════════════════════════════
+   KHEPRY — système de récompense unique
+   ════════════════════════════════════════════ */
+function awardKhepry(target, onDone){
+  /* Vérifie qu'on n'a pas déjà ce Khepry */
+  if(persistent.khepry[target]){
+    if(onDone)onDone();return;
+  }
+  persistent.khepry[target]=true;
+  persistData();
+  renderGauges(); // met à jour le badge
+
+  /* Affiche la notification */
+  document.getElementById("kh-title").textContent=`Khepry de ${target} obtenu !`;
+  document.getElementById("kh-desc").textContent=`Tu as atteint le lien le plus profond avec ${target}. Ce Khepry est conservé pour toutes tes aventures futures.`;
+  const notif=document.getElementById("khepry-notif");
+  notif.style.display="flex";
+  khepryNotifCallback=onDone;
+}
+
+function closeKhepryNotif(){
+  document.getElementById("khepry-notif").style.display="none";
+  if(khepryNotifCallback){khepryNotifCallback();khepryNotifCallback=null;}
+}
+
+/* ════════════════════════════════════════════
+   TYPEWRITE
+   ════════════════════════════════════════════ */
 function typeWrite(text,el,speed,onDone){
   clearTimeout(typeTimer);isTyping=true;el.textContent="";
   document.getElementById("dcursor").style.opacity="1";document.getElementById("narr").style.opacity="0";
   let i=0;
   function step(){
     if(i<text.length){el.textContent+=text[i++];typeTimer=setTimeout(step,speed||18);}
-    else{
-      isTyping=false;document.getElementById("dcursor").style.opacity="0";document.getElementById("narr").style.opacity="1";
-      if(onDone)onDone();if(autoMode)startAutoTimer();
-    }
+    else{isTyping=false;document.getElementById("dcursor").style.opacity="0";document.getElementById("narr").style.opacity="1";if(onDone)onDone();if(autoMode)startAutoTimer();}
   }
   step();
 }
+
 function skipType(){
   clearTimeout(typeTimer);
   const s=sceneNow();if(!s)return;
-  let txt=s.text;
-  if(s.text_condition){const val=getGameVar(s.text_condition.var);txt=s.text_condition[val]||s.text_condition.default||s.text;}
+  let txt=resolveText(s);
   document.getElementById("dtxt").textContent=txt;
   isTyping=false;document.getElementById("dcursor").style.opacity="0";document.getElementById("narr").style.opacity="1";
   if(s.choices&&s.choices.length>0)renderChoices(s);
   else if(autoMode)startAutoTimer();
 }
 
-/* ── SCENES ── */
-function sceneNow(){return chData?.scenes?.[currentSceneId];}
-function showScene(){
-  const s=sceneNow();if(!s){console.error("Scène introuvable:",currentSceneId);return;}
+/* ════════════════════════════════════════════
+   RÉSOLUTION DE TEXTE
+   Supporte : text, text_condition, text_condition avec valeurs par personnage
+   ════════════════════════════════════════════ */
+function resolveText(s){
+  if(s.text_condition){
+    const val=getGameVar(s.text_condition.var);
+    return s.text_condition[val]||s.text_condition.default||s.text||"";
+  }
+  return s.text||"";
+}
 
-  // Mini-jeu
+/* ════════════════════════════════════════════
+   RÉSOLUTION DE SCÈNE CONDITIONNELLE
+   affinity_gate : {min_affection, scenes:{Dazai:"c3_dazai_end", default:"c3_neutral"}}
+   Le moteur choisit la branche selon qui a le plus d'affinité et si elle dépasse le seuil.
+   ════════════════════════════════════════════ */
+function resolveAffinityGate(gate){
+  const threshold=gate.min_affection||0;
+  /* Cherche le LI avec l'affinité la plus haute dépassant le seuil */
+  let bestName=null, bestVal=-Infinity;
+  for(const[name,val] of Object.entries(save.affection)){
+    if(val>=threshold&&val>bestVal){bestVal=val;bestName=name;}
+  }
+  if(bestName&&gate.scenes&&gate.scenes[bestName]){
+    return gate.scenes[bestName];
+  }
+  return gate.scenes?.default||null;
+}
+
+/* ════════════════════════════════════════════
+   SCÈNES
+   ════════════════════════════════════════════ */
+function sceneNow(){return chData?.scenes?.[currentSceneId];}
+
+function showScene(){
+  const s=sceneNow();
+  if(!s){console.error("Scène introuvable:",currentSceneId);return;}
+
+  /* ── AFFINITY GATE : redirection immédiate selon affinité ── */
+  if(s.affinity_gate){
+    const target=resolveAffinityGate(s.affinity_gate);
+    if(target&&chData.scenes[target]){
+      sceneHistory.push(currentSceneId);
+      currentSceneId=target;showScene();return;
+    }else if(target){
+      /* La cible est dans un autre chapitre ou un ending */
+      const match=target.match(/^c(\d+)_s/);
+      if(match){loadChapterAndScene(parseInt(match[1]),target);return;}
+      /* Sinon considère comme ending JSON */
+      loadEndingJson(target);return;
+    }
+  }
+
+  /* ── MINIGAME ── */
   if(s.minigame){
+    if(s.background)setBg(s.background);
+    if(s.music)playMusic(s.music);
+    updateProgress();
     const mg=document.createElement('div');
     mg.id='minigame-layer';
     mg.style.cssText='position:fixed;inset:0;z-index:100;background:#0a0608';
-    mg.innerHTML=`<iframe src="minigames/${s.minigame}.html" style="width:100%;height:100%;border:none"></iframe>`;
+    mg.innerHTML=`<iframe src="minigames/${s.minigame}.html" style="width:100%;height:100%;border:none" allow="autoplay"></iframe>`;
     document.body.appendChild(mg);
     window.addEventListener('message',function handler(e){
       if(e.data?.type==='otome_goto'){
-        mg.remove();
-        window.removeEventListener('message',handler);
-        sceneHistory.push(currentSceneId);
-        currentSceneId=s.next;
-        showScene();
+        mg.remove();window.removeEventListener('message',handler);
+        sceneHistory.push(currentSceneId);currentSceneId=s.next;showScene();
       }
     });
     return;
   }
 
-  if(s.background)setBg(s.background);if(s.music)playMusic(s.music);setChars(s);
+  if(s.background)setBg(s.background);
+  if(s.music)playMusic(s.music);
+  setChars(s);
+
+  /* Bouton Revenir désactivé pendant les endings */
+  document.getElementById("btn-back").style.display=isEnding?"none":"flex";
+
   const spk=document.getElementById("spk");
   if(s.speaker){spk.textContent=s.speaker;spk.style.display="inline-block";spk.style.animation="none";spk.offsetHeight;spk.style.animation="";}
   else spk.style.display="none";
+
   const choicesEl=document.getElementById("choices");choicesEl.style.display="none";choicesEl.innerHTML="";
   updateBackBtn();
-  let txt=s.text;
-  if(s.text_condition){const val=getGameVar(s.text_condition.var);txt=s.text_condition[val]||s.text_condition.default||s.text;}
+
+  const txt=resolveText(s);
+
   typeWrite(txt,document.getElementById("dtxt"),18,()=>{
-    if(s.choices&&s.choices.length>0)renderChoices(s);
-    else if(!s.next)finishChapter();
+    if(s.choices&&s.choices.length>0){
+      renderChoices(s);
+    }else if(!s.next){
+      /* Pas de "next" défini : fin de chapitre ou fin du jeu */
+      handleChapterEnd();
+    }
   });
   updateProgress();
-
-  // Recalcule positions après rendu du dialogue
   requestAnimationFrame(()=>requestAnimationFrame(repositionCharsAndChoices));
 }
+
 function updateBackBtn(){
   const btn=document.getElementById("btn-back");
-  if(sceneHistory.length===0)btn.classList.add("disabled");else btn.classList.remove("disabled");
+  if(isEnding||sceneHistory.length===0)btn.classList.add("disabled");
+  else btn.classList.remove("disabled");
 }
 
-/* ── CHOICES ── */
+/* ════════════════════════════════════════════
+   CHOICES
+   Supporte : affection_target + affection_delta (visible en indice si défini)
+   ════════════════════════════════════════════ */
 function renderChoices(s){
   const area=document.getElementById("choices");area.innerHTML="";
   if(!s.choices||s.choices.length===0){area.style.display="none";return;}
   area.style.display="flex";area.style.animation="none";area.offsetHeight;area.style.animation="slideUp .4s ease both";
   s.choices.forEach(c=>{
     if(!c.label)return;
-    const btn=document.createElement("button");btn.className="cbtn";btn.textContent=c.label;
+    const btn=document.createElement("button");btn.className="cbtn";
+
+    /* Label principal */
+    const span=document.createElement("span");span.textContent=c.label;btn.appendChild(span);
+
+    /* Indice d'affinité (optionnel) */
+    if(c.affection_target&&c.affection_delta!==undefined){
+      const hint=document.createElement("span");
+      hint.className="aff-hint"+(c.affection_delta>=0?" pos":" neg");
+      hint.textContent=`(${c.affection_delta>=0?"+":""}${c.affection_delta} ${c.affection_target})`;
+      btn.appendChild(hint);
+    }
+
     btn.onclick=(e)=>{
       e.stopPropagation();
       area.style.display="none";
       if(c.set_variable){const eq=c.set_variable.indexOf("=");setGameVar(c.set_variable.substring(0,eq),c.set_variable.substring(eq+1));}
       if(c.affection_target&&c.affection_delta!==undefined)applyAffection(c.affection_target,c.affection_delta);
-      sceneHistory.push(currentSceneId);currentSceneId=c.next_scene;showScene();
+      sceneHistory.push(currentSceneId);
+      currentSceneId=c.next_scene;
+      showScene();
     };
     area.appendChild(btn);
   });
   repositionCharsAndChoices();
 }
+
 function onDialogClick(){
-  const choicesEl = document.getElementById("choices");
+  const choicesEl=document.getElementById("choices");
   if(choicesEl.style.display!=="none"&&choicesEl.children.length>0)return;
   if(isTyping){skipType();return;}
   const s=sceneNow();if(!s)return;
   if(s.next){
     if(chData.scenes[s.next]){
-      clearAutoTimer();sceneHistory.push(currentSceneId);currentSceneId=s.next;updateProgress();showScene();
-    }else{
-      const match=s.next.match(/^c(\d+)_s/);
-      if(match){
-        const targetChapter=parseInt(match[1]);
-        if(targetChapter!==currentChapter)loadChapterAndScene(targetChapter,s.next);
-        else showToast("Scène introuvable : "+s.next);
-      }else{
-        showToast("Scène introuvable : "+s.next);
-      }
+      clearAutoTimer();sceneHistory.push(currentSceneId);currentSceneId=s.next;updateProgress();showScene();return;
     }
+    const match=s.next.match(/^c(\d+)_s/);
+    if(match){loadChapterAndScene(parseInt(match[1]),s.next);return;}
+    /* next pointe vers un JSON d'ending */
+    if(s.next.startsWith("ending_")||s.next.endsWith(".json")){loadEndingJson(s.next);return;}
+    showToast("Scène introuvable : "+s.next);
   }
 }
+
 function prevScene(){
-  if(sceneHistory.length===0)return;
+  if(isEnding||sceneHistory.length===0)return;
   clearAutoTimer();currentSceneId=sceneHistory.pop();showScene();showToast("◀ Retour");
 }
 
-/* ── FIN DE CHAPITRE : transition directe → chapitre suivant ── */
-async function finishChapter(){
+/* ════════════════════════════════════════════
+   FIN DE CHAPITRE
+   Essaie de charger le chapitre suivant.
+   Si c'est le dernier, calcule l'affinité et déclenche le bon ending.
+   ════════════════════════════════════════════ */
+async function handleChapterEnd(){
   updateProgress();
   const nextChapter=currentChapter+1;
-  let nextReady=false;
+
+  /* Tentative de chargement du chapitre suivant */
   try{
     const r=await fetch("json/chapter"+nextChapter+".json?v="+Date.now());
     if(r.ok){
       const data=await r.json();
-      // Le chapitre suivant est prêt seulement s'il a un "start", des scènes définies,
-      // ET que la scène de départ a du contenu réel (text non vide OU un next)
-      const startScene = data.start && data.scenes && data.scenes[data.start];
-      nextReady=!!(startScene && (startScene.text || startScene.next || startScene.choices));
-      if(nextReady){
-        // On a déjà le JSON, on le charge directement sans re-fetcher
+      /* Vérifie que le JSON contient bien des scènes (même si peu) */
+      if(data.scenes&&Object.keys(data.scenes).length>0){
         chData=data;
         currentChapter=nextChapter;currentSceneId=chData.start;sceneHistory=[];
         save.currentChapter=nextChapter;save.currentSceneId=currentSceneId;
-        if(!save.unlockedChapters.includes(nextChapter))save.unlockedChapters.push(nextChapter);persistSave();
+        if(!save.unlockedChapters.includes(nextChapter))save.unlockedChapters.push(nextChapter);
+        persistSave();
         document.getElementById("top-title").textContent=(chData.title||"").substring(0,32);
         initGauges(chData.scenes);introSkip=false;showIntro(chData);
         const wait=setInterval(()=>{if(document.getElementById("ch-intro").style.display==="none"){clearInterval(wait);showScene();}},80);
         return;
       }
     }
-  }catch{}
-  // Pas de chapitre suivant valide → fin du jeu
-  showEnding();
+  }catch(e){console.warn("Chapitre suivant non disponible:",e);}
+
+  /* Pas de chapitre suivant → calcul d'ending */
+  triggerEndingCalculation();
 }
 
+/* ════════════════════════════════════════════
+   CALCUL D'ENDING
+   Détermine quel ending charger selon l'affinité.
+   Le fichier ending attendu : json/ending_{nom}.json ou json/ending_neutral.json
+   ════════════════════════════════════════════ */
+async function triggerEndingCalculation(){
+  isEnding=true;
+  updateBackBtn();
+
+  /* Trouve le LI avec la plus haute affinité */
+  let bestName=null,bestVal=-Infinity;
+  for(const[name,val] of Object.entries(save.affection)){
+    if(val>bestVal){bestVal=val;bestName=name;}
+  }
+
+  /* Seuil minimum pour déclencher un ending romantique */
+  const threshold=SEUIL_KHEPRY_DEFAULT;
+
+  if(bestName&&bestVal>=threshold){
+    /* Ending romantique */
+    const endingFile=`ending_${bestName.toLowerCase()}.json`;
+    await loadEndingJson(endingFile,bestName,bestVal);
+  }else{
+    /* Ending neutre */
+    await loadEndingJson("ending_neutral.json",null,0);
+  }
+}
+
+/* ════════════════════════════════════════════
+   CHARGEMENT D'UN ENDING JSON
+   Format du JSON d'ending : voir exemple plus bas.
+   Peut contenir des scènes normales, puis un "ending_result".
+   ════════════════════════════════════════════ */
+async function loadEndingJson(fileOrName,winnerName,winnerVal){
+  /* Normalise le nom du fichier */
+  let file=fileOrName;
+  if(!file.endsWith(".json"))file=`json/${file}`;
+  else if(!file.startsWith("json/"))file=`json/${file}`;
+
+  try{
+    const r=await fetch(file+"?v="+Date.now());
+    if(!r.ok)throw new Error("404");
+    const data=await r.json();
+
+    /* Si l'ending a des scènes narrées (optionnel) */
+    if(data.scenes&&data.start){
+      chData=data;
+      currentSceneId=chData.start;
+      sceneHistory=[];
+      isEnding=true;
+      document.getElementById("top-title").textContent=(data.title||"Épilogue").substring(0,32);
+      /* Pas d'intro pour les endings */
+      document.getElementById("ch-intro").style.display="none";
+
+      /* Khepry avant les scènes si seuil atteint */
+      if(data.khepry_target&&data.khepry_threshold!==undefined){
+        const tv=save.affection[data.khepry_target]??0;
+        if(tv>=data.khepry_threshold&&!persistent.khepry[data.khepry_target]){
+          awardKhepry(data.khepry_target,()=>showScene());
+          return;
+        }
+      }
+      showScene();
+      return;
+    }
+
+    /* Ending direct (pas de scènes, juste les métadonnées) */
+    if(data.ending_result){
+      const res=data.ending_result;
+      /* Khepry */
+      if(res.khepry_target&&res.khepry_threshold!==undefined){
+        const tv=save.affection[res.khepry_target]??winnerVal??0;
+        if(tv>=(res.khepry_threshold||SEUIL_KHEPRY_DEFAULT)&&!persistent.khepry[res.khepry_target]){
+          awardKhepry(res.khepry_target,()=>showEndingScreen(res));
+          return;
+        }
+      }
+      showEndingScreen(res);
+    }
+  }catch(e){
+    console.warn("Ending JSON introuvable, affichage fallback :",file,e);
+    showEndingScreen({
+      tag:"✦ Fin",
+      title:"À suivre…",
+      description:"Ton histoire continue dans les prochains chapitres."
+    });
+  }
+}
+
+function showEndingScreen(res){
+  document.getElementById("ending-tag").textContent=res.tag||"✦ Fin";
+  document.getElementById("ending-title").textContent=res.title||"";
+  document.getElementById("ending-desc").textContent=res.description||"";
+  document.getElementById("ending-ov").style.display="flex";
+}
+
+/* ════════════════════════════════════════════
+   RESTART — remet affinité à zéro, conserve Khepry
+   ════════════════════════════════════════════ */
+function restartGame(){
+  save=defaultSave();
+  gameVars={};
+  isEnding=false;
+  persistSave();
+  /* persistent.khepry conservé */
+  document.getElementById("ending-ov").style.display="none";
+  loadChapter(1);
+}
+
+/* ════════════════════════════════════════════
+   CHARGEMENT DE CHAPITRE
+   ════════════════════════════════════════════ */
 async function loadChapter(n){
   try{
     const res=await fetch("json/chapter"+n+".json?v="+Date.now());
@@ -622,91 +919,6 @@ async function loadChapter(n){
     const wait=setInterval(()=>{if(document.getElementById("ch-intro").style.display==="none"){clearInterval(wait);showScene();}},80);
   }catch(e){showToast("Erreur : impossible de charger le chapitre "+n);console.error(e);}
 }
-
-/* ── ENDING FINAL (uniquement dernier chapitre) ── */
-function showEnding(){
-  let best=null,bestScore=-Infinity,worst=null,worstScore=Infinity;
-  liNames.forEach(name=>{const v=save.affection[name]??0;if(v>bestScore){bestScore=v;best=name;}if(v<worstScore){worstScore=v;worst=name;}});
-  let tag,title,desc;
-  if(bestScore>=100){tag="✦ Bonne Fin";title=(best||"")+" — La Plume Dorée";desc="Le Livre de la Fin brille d'une lumière dorée. Une page se referme. Une autre commence — celle que tu as choisie d'écrire.";}
-  else if(worstScore<=-100){tag="✦ Mauvaise Fin";title=(worst||"")+" — La Plume Pourrie";desc="Le Livre de la Fin noircit. Quelque chose s'est brisé. Les mots disparaissent un à un, et l'obscurité prend leur place.";}
-  else{tag="✦ Fin Mystérieuse";title="Le Livre reste ouvert";desc="Aucun lien n'a atteint son terme. Le Livre te ramène au commencement. Peut-être qu'une autre version de cette histoire attend d'être écrite.";}
-  document.getElementById("ending-tag").textContent=tag;
-  document.getElementById("ending-title").textContent=title;
-  document.getElementById("ending-desc").textContent=desc;
-  document.getElementById("ending-ov").style.display="flex";
-}
-
-/* ── INTRO ── */
-function showIntro(data){
-  const el=document.getElementById("ch-intro");el.style.display="flex";el.style.opacity="1";
-  document.getElementById("ci-tag").textContent="✦ Chapitre "+data.chapter;
-  document.getElementById("ci-ttl").textContent=data.title||"Sans titre";
-  document.getElementById("ci-desc").textContent="";
-  const fill=document.getElementById("ci-fill");fill.style.width="0%";let pct=0;
-  const iv=setInterval(()=>{pct+=2;fill.style.width=pct+"%";if(pct>=100){clearInterval(iv);setTimeout(()=>{if(!introSkip)hideIntro();},200);}},40);
-}
-function hideIntro(){
-  const el=document.getElementById("ch-intro");el.style.transition="opacity .6s ease";el.style.opacity="0";
-  setTimeout(()=>{el.style.display="none";el.style.transition="";},620);
-}
-function skipIntro(){introSkip=true;document.getElementById("ch-intro").style.display="none";}
-
-/* ── AUTO ── */
-function toggleAuto(){
-  autoMode=!autoMode;const ind=document.getElementById("mode-ind");ind.textContent="AUTO";ind.style.display=autoMode?"block":"none";
-  if(!autoMode)clearAutoTimer();else if(!isTyping)startAutoTimer();showToast(autoMode?"Auto ON":"Auto OFF");
-}
-function startAutoTimer(){
-  clearAutoTimer();const d=(sceneNow()?.pause??1000)+800;
-  autoTimer=setTimeout(()=>{const cv=document.getElementById("choices").style.display!=="none"&&document.getElementById("choices").children.length>0;if(!cv)onDialogClick();},d);
-}
-function clearAutoTimer(){if(autoTimer){clearTimeout(autoTimer);autoTimer=null;}}
-
-/* ── OVERLAYS ── */
-function openPause(){document.getElementById("pause-ov").style.display="flex";}
-function closePause(){document.getElementById("pause-ov").style.display="none";}
-function askLeave(dest){closePause();pendingLeave=dest;document.getElementById("save-ov").style.display="flex";document.getElementById("sy").onclick=()=>{quickSave();doLeave();};document.getElementById("sn").onclick=()=>{doLeave();};}
-function closeSaveOv(){document.getElementById("save-ov").style.display="none";pendingLeave=null;}
-function doLeave(){document.getElementById("save-ov").style.display="none";if(pendingLeave==="menu")goMenu();else goChapters();}
-function openHelp(){document.getElementById("help-ov").style.display="flex";}
-function closeHelp(){document.getElementById("help-ov").style.display="none";}
-function quickSave(){updateProgress();showToast("✓ Sauvegardé");}
-function goMenu(){window.location.href="index.html";}
-function goChapters(){window.location.href="chapters.html";}
-let toastT=null;
-function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.style.opacity="1";clearTimeout(toastT);toastT=setTimeout(()=>{t.style.opacity="0";},2200);}
-
-/* ── CLAVIER ── */
-document.addEventListener("keydown",e=>{
-  if(document.getElementById("pause-ov").style.display==="flex"||document.getElementById("help-ov").style.display==="flex")return;
-  if(e.key===" "||e.key==="Enter"||e.key==="ArrowRight"){e.preventDefault();onDialogClick();}
-  if(e.key==="ArrowLeft"){e.preventDefault();prevScene();}
-  if(e.key==="Escape"){e.preventDefault();openPause();}
-  if(e.key==="a"||e.key==="A")toggleAuto();
-  if(e.key==="s"||e.key==="S")quickSave();
-});
-
-/* ── INIT ── */
-async function init(){
-  save=loadSave();currentChapter=save.currentChapter||1;
-  try{const res=await fetch("json/chapter"+currentChapter+".json?v="+Date.now());chData=await res.json();}
-  catch(e){document.getElementById("dtxt").textContent="Erreur : impossible de charger chapter"+currentChapter+".json";console.error(e);return;}
-  const hasSave=save.currentSceneId&&chData.scenes[save.currentSceneId];
-  currentSceneId=hasSave?save.currentSceneId:chData.start;
-  sceneHistory=[];
-  document.getElementById("top-title").textContent=(chData.title||"Le Livre de la Fin").substring(0,32);
-  initGauges(chData.scenes);
-  if(hasSave){
-    document.getElementById("ch-intro").style.display="none";
-    showScene();
-  }else{
-    introSkip=false;showIntro(chData);
-    const wait=setInterval(()=>{if(document.getElementById("ch-intro").style.display==="none"){clearInterval(wait);showScene();}},80);
-  }
-}
-
-window.addEventListener("load",init);
 
 async function loadChapterAndScene(num,sceneId){
   try{
@@ -723,6 +935,90 @@ async function loadChapterAndScene(num,sceneId){
     showScene();
   }catch(e){console.error(e);showToast("Erreur : impossible de charger le chapitre "+num);}
 }
+
+/* ════════════════════════════════════════════
+   INTRO / FIN DE CHAPITRE
+   ════════════════════════════════════════════ */
+function showIntro(data){
+  const el=document.getElementById("ch-intro");el.style.display="flex";el.style.opacity="1";
+  document.getElementById("ci-tag").textContent="✦ Chapitre "+data.chapter;
+  document.getElementById("ci-ttl").textContent=data.title||"Sans titre";
+  document.getElementById("ci-desc").textContent="";
+  const fill=document.getElementById("ci-fill");fill.style.width="0%";let pct=0;
+  const iv=setInterval(()=>{pct+=2;fill.style.width=pct+"%";if(pct>=100){clearInterval(iv);setTimeout(()=>{if(!introSkip)hideIntro();},200);}},40);
+}
+function hideIntro(){
+  const el=document.getElementById("ch-intro");el.style.transition="opacity .6s ease";el.style.opacity="0";
+  setTimeout(()=>{el.style.display="none";el.style.transition="";},620);
+}
+function skipIntro(){introSkip=true;document.getElementById("ch-intro").style.display="none";}
+
+/* ════════════════════════════════════════════
+   AUTO
+   ════════════════════════════════════════════ */
+function toggleAuto(){
+  autoMode=!autoMode;const ind=document.getElementById("mode-ind");ind.textContent="AUTO";ind.style.display=autoMode?"block":"none";
+  if(!autoMode)clearAutoTimer();else if(!isTyping)startAutoTimer();showToast(autoMode?"Auto ON":"Auto OFF");
+}
+function startAutoTimer(){
+  clearAutoTimer();const d=(sceneNow()?.pause??1000)+800;
+  autoTimer=setTimeout(()=>{const cv=document.getElementById("choices").style.display!=="none"&&document.getElementById("choices").children.length>0;if(!cv)onDialogClick();},d);
+}
+function clearAutoTimer(){if(autoTimer){clearTimeout(autoTimer);autoTimer=null;}}
+
+/* ════════════════════════════════════════════
+   OVERLAYS
+   ════════════════════════════════════════════ */
+function openPause(){document.getElementById("pause-ov").style.display="flex";}
+function closePause(){document.getElementById("pause-ov").style.display="none";}
+function askLeave(dest){closePause();pendingLeave=dest;document.getElementById("save-ov").style.display="flex";document.getElementById("sy").onclick=()=>{quickSave();doLeave();};document.getElementById("sn").onclick=()=>{doLeave();};}
+function closeSaveOv(){document.getElementById("save-ov").style.display="none";pendingLeave=null;}
+function doLeave(){document.getElementById("save-ov").style.display="none";if(pendingLeave==="menu")goMenu();else goChapters();}
+function openHelp(){document.getElementById("help-ov").style.display="flex";}
+function closeHelp(){document.getElementById("help-ov").style.display="none";}
+function quickSave(){updateProgress();showToast("✓ Sauvegardé");}
+function goMenu(){window.location.href="index.html";}
+function goChapters(){window.location.href="chapters.html";}
+
+let toastT=null;
+function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.style.opacity="1";clearTimeout(toastT);toastT=setTimeout(()=>{t.style.opacity="0";},2200);}
+
+/* ════════════════════════════════════════════
+   CLAVIER
+   ════════════════════════════════════════════ */
+document.addEventListener("keydown",e=>{
+  if(document.getElementById("pause-ov").style.display==="flex"||document.getElementById("help-ov").style.display==="flex")return;
+  if(e.key===" "||e.key==="Enter"||e.key==="ArrowRight"){e.preventDefault();onDialogClick();}
+  if(e.key==="ArrowLeft"){e.preventDefault();prevScene();}
+  if(e.key==="Escape"){e.preventDefault();openPause();}
+  if(e.key==="a"||e.key==="A")toggleAuto();
+  if(e.key==="s"||e.key==="S")quickSave();
+});
+
+/* ════════════════════════════════════════════
+   INIT
+   ════════════════════════════════════════════ */
+async function init(){
+  save=loadSave();
+  persistent=loadPersistent();
+  if(save.gameVars)gameVars=Object.assign({},save.gameVars);
+  currentChapter=save.currentChapter||1;
+  try{const res=await fetch("json/chapter"+currentChapter+".json?v="+Date.now());chData=await res.json();}
+  catch(e){document.getElementById("dtxt").textContent="Erreur : impossible de charger chapter"+currentChapter+".json";console.error(e);return;}
+  const hasSave=save.currentSceneId&&chData.scenes&&chData.scenes[save.currentSceneId];
+  currentSceneId=hasSave?save.currentSceneId:chData.start;
+  sceneHistory=[];
+  document.getElementById("top-title").textContent=(chData.title||"Le Livre de la Fin").substring(0,32);
+  initGauges(chData.scenes);
+  if(hasSave){
+    document.getElementById("ch-intro").style.display="none";showScene();
+  }else{
+    introSkip=false;showIntro(chData);
+    const wait=setInterval(()=>{if(document.getElementById("ch-intro").style.display==="none"){clearInterval(wait);showScene();}},80);
+  }
+}
+
+window.addEventListener("load",init);
 </script>
 </body>
 </html>
