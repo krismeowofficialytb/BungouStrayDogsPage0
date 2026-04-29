@@ -4,8 +4,23 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Le Livre de la Fin</title>
-<script src="js/global.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Rajdhani:wght@300;400;600;700&family=Special+Elite&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+
+<!-- ══ PERFORMANCE : preconnect & preload fonts ══ -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Rajdhani:wght@300;400;600;700&family=Special+Elite&family=IM+Fell+English:ital@0;1&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Rajdhani:wght@300;400;600;700&family=Special+Elite&family=IM+Fell+English:ital@0;1&display=swap">
+</noscript>
+
+<!-- ══ PERFORMANCE : version fixe (pas de Date.now() = pas de cache-bust sauvage) ══ -->
+<script>
+  /* Incrémente CACHE_VER à chaque déploiement de nouveaux JSON/assets */
+  window.CACHE_VER = "1";
+</script>
+
+<script src="js/global.js" defer></script>
+
 <style>
 @keyframes fadeIn    {from{opacity:0}to{opacity:1}}
 @keyframes slideUp   {from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
@@ -42,7 +57,8 @@ button{cursor:pointer;font-family:'Rajdhani',sans-serif;border:none;background:n
 /* ── BACKGROUND ── */
 #bg-layer{position:absolute;inset:0;z-index:0;background:#0a0608}
 #bg-img,#bg-next{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-#bg-next{opacity:0;transition:opacity .8s ease}
+/* ══ PERF : will-change pour les layers animés ══ */
+#bg-next{opacity:0;transition:opacity .8s ease;will-change:opacity}
 .g-overlay{position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(180deg,rgba(10,6,8,.25) 0%,rgba(10,6,8,.05) 40%,rgba(10,6,8,.42) 70%,rgba(10,6,8,.86) 100%)}
 .noise{position:absolute;inset:0;z-index:2;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");animation:noiseShift .5s steps(10) infinite}
 .scan{position:absolute;z-index:3;pointer-events:none;left:0;width:100%;height:4px;background:rgba(255,255,255,.04);animation:scanAnim 3s linear infinite}
@@ -52,6 +68,7 @@ button{cursor:pointer;font-family:'Rajdhani',sans-serif;border:none;background:n
 #char-l,#char-r,#char-c{
   position:absolute;bottom:0;z-index:6;pointer-events:none;transition:opacity .4s;
   height:80%;max-height:80%;width:auto;object-fit:contain;object-position:bottom center;
+  will-change:opacity,transform; /* ══ PERF ══ */
 }
 #char-l{left:5%;animation:charL .4s ease both}
 #char-r{right:5%;animation:charR .4s ease both}
@@ -209,7 +226,7 @@ button{cursor:pointer;font-family:'Rajdhani',sans-serif;border:none;background:n
 <body>
 
 <div id="bg-layer">
-  <img id="bg-img" src="" alt="">
+  <img id="bg-img" src="" alt="" fetchpriority="high">
   <img id="bg-next" src="" alt="">
   <div class="g-overlay"></div>
   <div class="noise"></div>
@@ -265,8 +282,8 @@ button{cursor:pointer;font-family:'Rajdhani',sans-serif;border:none;background:n
 
 <div id="choices" style="display:none"></div>
 
-<audio id="music" loop></audio>
-<audio id="sfx"></audio>
+<audio id="music" loop preload="metadata"></audio>
+<audio id="sfx" preload="metadata"></audio>
 
 <div id="pause-ov">
   <div id="pause-p">
@@ -339,7 +356,6 @@ button{cursor:pointer;font-family:'Rajdhani',sans-serif;border:none;background:n
   </div>
 </div>
 
-<!-- Notification Khepry -->
 <div id="khepry-notif">
   <div class="kh-sym">𓆣</div>
   <h3 id="kh-title">Khepry obtenu !</h3>
@@ -351,43 +367,147 @@ button{cursor:pointer;font-family:'Rajdhani',sans-serif;border:none;background:n
 
 <script>
 /* ════════════════════════════════════════════
-   CONSTANTES DE CONFIGURATION
+   ██████╗ ███████╗██████╗ ███████╗
+   ██╔══██╗██╔════╝██╔══██╗██╔════╝
+   ██████╔╝█████╗  ██████╔╝█████╗
+   ██╔═══╝ ██╔══╝  ██╔══██╗██╔══╝
+   ██║     ███████╗██║  ██║██║
+   ╚═╝     ╚══════╝╚═╝  ╚═╝╚═╝
+   OPTIMISATIONS PERFORMANCE
    ════════════════════════════════════════════
-   SEUIL_KHEPRY : affinité minimale pour obtenir un Khepry à la fin.
-   Les personnages valides sont listés dans love_interests du JSON de chapitre.
-   Pour les endings neutres, créer un fichier ending_neutral.json.
-*/
-const SEUIL_KHEPRY_DEFAULT = 60;  // Seuil par défaut si non défini dans le JSON d'ending
+
+   1. CACHE_VER fixe (plus de Date.now() = le navigateur peut cacher les JSON)
+   2. jsonCache en mémoire (un JSON chargé = jamais rechargé)
+   3. preloadNextSceneAssets() appelé dès qu'une scène est affichée
+   4. prefetchNextChapter() appelé en arrière-plan vers la fin d'un chapitre
+   5. Resize debounced (pas de calculs inutiles au redimensionnement)
+   6. Service Worker enregistré pour le cache offline/réseau lent
+   ════════════════════════════════════════════ */
+
+/* ── VERSION DE CACHE ── Changer à chaque déploiement de nouveaux assets/JSON ── */
+const CACHE_VER = window.CACHE_VER || "1";
 
 /* ════════════════════════════════════════════
-   GAME VARS (variables de scénario)
+   SERVICE WORKER
+   ════════════════════════════════════════════ */
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("sw.js").catch(() => {});
+}
+
+/* ════════════════════════════════════════════
+   JSON CACHE EN MÉMOIRE
+   Un chapitre ou ending est fetché une seule fois par session.
+   ════════════════════════════════════════════ */
+const jsonCache = new Map();
+
+async function fetchJSON(url) {
+  if (jsonCache.has(url)) return jsonCache.get(url);
+  /* Pas de Date.now() ici — on utilise CACHE_VER uniquement pour invalider
+     lors d'un vrai déploiement, pas à chaque chargement de page */
+  const versioned = url + "?v=" + CACHE_VER;
+  const r = await fetch(versioned);
+  if (!r.ok) throw new Error(`HTTP ${r.status} - ${url}`);
+  const data = await r.json();
+  jsonCache.set(url, data);
+  return data;
+}
+
+/* ════════════════════════════════════════════
+   PRÉCHARGEMENT D'ASSETS
+   Précharge les images/sons de la scène N+1 pendant que le joueur lit N.
+   ════════════════════════════════════════════ */
+const preloadedImages = new Set();
+const preloadedAudio  = new Set();
+
+function preloadImage(src) {
+  if (!src || preloadedImages.has(src)) return;
+  preloadedImages.add(src);
+  const img = new Image();
+  img.src = src;
+}
+
+function preloadAudioAsset(src) {
+  if (!src || preloadedAudio.has(src)) return;
+  preloadedAudio.add(src);
+  const a = new Audio();
+  a.preload = "metadata";
+  a.src = src;
+}
+
+function resolveCharPaths(character) {
+  const paths = [];
+  if (!character || character === "null") return paths;
+  if (typeof character === "string") {
+    paths.push("images/characters/" + character);
+  } else {
+    if (character.left)  paths.push("images/characters/" + character.left);
+    if (character.right) paths.push("images/characters/" + character.right);
+  }
+  return paths;
+}
+
+/**
+ * Précharge les assets de la scène cible (background, personnages, musique).
+ * Appelle aussi les scènes suivantes en cascade jusqu'à profondeur `depth`.
+ */
+function preloadSceneAssets(sceneId, depth = 2) {
+  if (!chData || !sceneId || depth <= 0) return;
+  const s = chData.scenes?.[sceneId];
+  if (!s) return;
+
+  if (s.background) preloadImage(
+    s.background.includes("/") ? s.background : "images/backgrounds/" + s.background
+  );
+  resolveCharPaths(s.character).forEach(preloadImage);
+  if (s.music) preloadAudioAsset(
+    s.music.includes("/") ? s.music : "music/" + s.music
+  );
+
+  /* Cascade sur les scènes suivantes */
+  if (depth > 1) {
+    if (s.next) preloadSceneAssets(s.next, depth - 1);
+    if (s.choices) s.choices.forEach(c => {
+      if (c.next_scene) preloadSceneAssets(c.next_scene, depth - 1);
+    });
+  }
+}
+
+/**
+ * Précharge le JSON du chapitre suivant en arrière-plan
+ * (déclenché quand il reste peu de scènes dans le chapitre actuel).
+ */
+function prefetchNextChapter(n) {
+  const url = "json/chapter" + n + ".json";
+  if (jsonCache.has(url)) return;
+  /* On utilise fetch directement sans attendre le résultat */
+  fetch(url + "?v=" + CACHE_VER)
+    .then(r => r.ok ? r.json() : null)
+    .then(data => { if (data) jsonCache.set(url, data); })
+    .catch(() => {});
+}
+
+/* ════════════════════════════════════════════
+   CONSTANTES DE CONFIGURATION
+   ════════════════════════════════════════════ */
+const SEUIL_KHEPRY_DEFAULT = 60;
+
+/* ════════════════════════════════════════════
+   GAME VARS
    ════════════════════════════════════════════ */
 let gameVars = {};
 function setGameVar(k,v){gameVars[k]=v;}
 function getGameVar(k,d=null){return gameVars.hasOwnProperty(k)?gameVars[k]:d;}
 
 /* ════════════════════════════════════════════
-   SAVE — deux couches :
-   - save       : progression actuelle (affinité, chapitre, scène)
-   - persistent : données inter-runs (Khepry gagnés)
+   SAVE
    ════════════════════════════════════════════ */
 const SAVE_KEY       = "otome_save_v3";
 const PERSISTENT_KEY = "otome_persistent_v1";
 
 function defaultSave(){
-  return {
-    unlockedChapters:[1],
-    currentChapter:1,
-    currentSceneId:null,
-    affection:{},      // {Dazai:40, Kunikida:-10, ...}
-    gameVars:{}
-  };
+  return {unlockedChapters:[1],currentChapter:1,currentSceneId:null,affection:{},gameVars:{}};
 }
-function defaultPersistent(){
-  return {
-    khepry:{}   // {Dazai:true, Lucy:true} — un seul par perso, jamais réinitialisé
-  };
-}
+function defaultPersistent(){return {khepry:{}};}
 
 function loadSave(){
   const r=localStorage.getItem(SAVE_KEY);
@@ -398,8 +518,7 @@ function loadSave(){
 function loadPersistent(){
   const r=localStorage.getItem(PERSISTENT_KEY);
   if(!r)return defaultPersistent();
-  try{return JSON.parse(r);}
-  catch{return defaultPersistent();}
+  try{return JSON.parse(r);}catch{return defaultPersistent();}
 }
 function persistSave(){localStorage.setItem(SAVE_KEY,JSON.stringify(save));}
 function persistData(){localStorage.setItem(PERSISTENT_KEY,JSON.stringify(persistent));}
@@ -415,13 +534,14 @@ function updateProgress(){
 /* ════════════════════════════════════════════
    ÉTAT GLOBAL
    ════════════════════════════════════════════ */
-let chData=null, currentChapter=1, currentSceneId=null, sceneHistory=[], isEnding=false;
-let save=loadSave(), persistent=loadPersistent();
-let isTyping=false, typeTimer=null, autoMode=false, autoTimer=null, pendingLeave=null, introSkip=false;
-let liNames=[];   // liste des love interests du chapitre courant
+let chData=null,currentChapter=1,currentSceneId=null,sceneHistory=[],isEnding=false;
+let save=loadSave(),persistent=loadPersistent();
+let isTyping=false,typeTimer=null,autoMode=false,autoTimer=null,pendingLeave=null,introSkip=false;
+let liNames=[];
 let khepryNotifCallback=null;
+/* Compteur de scènes vues dans le chapitre — pour déclencher le prefetch */
+let scenesViewedInChapter = 0;
 
-/* Restaurer gameVars depuis la sauvegarde */
 if(save.gameVars)gameVars=Object.assign({},save.gameVars);
 
 /* ════════════════════════════════════════════
@@ -448,7 +568,7 @@ window.addEventListener('storage',(e)=>{
 });
 
 /* ════════════════════════════════════════════
-   BACKGROUND
+   BACKGROUND (inchangé)
    ════════════════════════════════════════════ */
 let lastBg="";
 function setBg(src){
@@ -476,16 +596,23 @@ function setChars(scene){
   repositionCharsAndChoices();
 }
 
+/* ════════════════════════════════════════════
+   RESIZE — debounced pour éviter les calculs inutiles
+   ════════════════════════════════════════════ */
+let _resizeTimer = null;
 function repositionCharsAndChoices(){
   const dialogArea=document.getElementById("dialog-area");
   const choicesEl=document.getElementById("choices");
   const dh=dialogArea.offsetHeight||180;
   choicesEl.style.bottom=(dh+10)+"px";
 }
-window.addEventListener("resize",repositionCharsAndChoices);
+window.addEventListener("resize",()=>{
+  clearTimeout(_resizeTimer);
+  _resizeTimer=setTimeout(repositionCharsAndChoices,120);
+});
 
 /* ════════════════════════════════════════════
-   GAUGES — affinité visuelle
+   GAUGES
    ════════════════════════════════════════════ */
 function initGauges(scenesObj){
   const found={};
@@ -497,7 +624,6 @@ function initGauges(scenesObj){
   liNames=Object.keys(found);
   renderGauges();
 }
-
 function renderGauges(){
   const container=document.getElementById("gauges");container.innerHTML="";
   liNames.forEach(name=>{
@@ -506,7 +632,6 @@ function renderGauges(){
     const item=document.createElement("div");item.className="g-item";
     const ava=document.createElement("div");ava.className="g-ava-ph";
     ava.textContent=name.charAt(0).toUpperCase();
-    // Badge Khepry
     const badge=document.createElement("div");badge.className="g-khepry";badge.textContent="𓆣";
     if(hasKhepry)badge.style.display="block";
     ava.appendChild(badge);
@@ -520,7 +645,6 @@ function renderGauges(){
     container.appendChild(item);
   });
 }
-
 function applyAffection(target,delta){
   if(!target||delta===undefined)return;
   save.affection[target]=Math.min(100,Math.max(-100,(save.affection[target]??0)+delta));
@@ -536,7 +660,6 @@ function applyAffection(target,delta){
   }
   showPointPopup(target,delta);
 }
-
 function showPointPopup(target,delta){
   const items=document.querySelectorAll(".g-item");let rect=null;
   for(let i=0;i<items.length;i++){if(liNames[i]===target){rect=items[i].querySelector(".g-fill")?.getBoundingClientRect();break;}}
@@ -548,25 +671,16 @@ function showPointPopup(target,delta){
 }
 
 /* ════════════════════════════════════════════
-   KHEPRY — système de récompense unique
+   KHEPRY
    ════════════════════════════════════════════ */
-function awardKhepry(target, onDone){
-  /* Vérifie qu'on n'a pas déjà ce Khepry */
-  if(persistent.khepry[target]){
-    if(onDone)onDone();return;
-  }
-  persistent.khepry[target]=true;
-  persistData();
-  renderGauges(); // met à jour le badge
-
-  /* Affiche la notification */
+function awardKhepry(target,onDone){
+  if(persistent.khepry[target]){if(onDone)onDone();return;}
+  persistent.khepry[target]=true;persistData();renderGauges();
   document.getElementById("kh-title").textContent=`Khepry de ${target} obtenu !`;
   document.getElementById("kh-desc").textContent=`Tu as atteint le lien le plus profond avec ${target}. Ce Khepry est conservé pour toutes tes aventures futures.`;
   const notif=document.getElementById("khepry-notif");
-  notif.style.display="flex";
-  khepryNotifCallback=onDone;
+  notif.style.display="flex";khepryNotifCallback=onDone;
 }
-
 function closeKhepryNotif(){
   document.getElementById("khepry-notif").style.display="none";
   if(khepryNotifCallback){khepryNotifCallback();khepryNotifCallback=null;}
@@ -585,7 +699,6 @@ function typeWrite(text,el,speed,onDone){
   }
   step();
 }
-
 function skipType(){
   clearTimeout(typeTimer);
   const s=sceneNow();if(!s)return;
@@ -598,7 +711,6 @@ function skipType(){
 
 /* ════════════════════════════════════════════
    RÉSOLUTION DE TEXTE
-   Supporte : text, text_condition, text_condition avec valeurs par personnage
    ════════════════════════════════════════════ */
 function resolveText(s){
   if(s.text_condition){
@@ -610,19 +722,14 @@ function resolveText(s){
 
 /* ════════════════════════════════════════════
    RÉSOLUTION DE SCÈNE CONDITIONNELLE
-   affinity_gate : {min_affection, scenes:{Dazai:"c3_dazai_end", default:"c3_neutral"}}
-   Le moteur choisit la branche selon qui a le plus d'affinité et si elle dépasse le seuil.
    ════════════════════════════════════════════ */
 function resolveAffinityGate(gate){
   const threshold=gate.min_affection||0;
-  /* Cherche le LI avec l'affinité la plus haute dépassant le seuil */
-  let bestName=null, bestVal=-Infinity;
+  let bestName=null,bestVal=-Infinity;
   for(const[name,val] of Object.entries(save.affection)){
     if(val>=threshold&&val>bestVal){bestVal=val;bestName=name;}
   }
-  if(bestName&&gate.scenes&&gate.scenes[bestName]){
-    return gate.scenes[bestName];
-  }
+  if(bestName&&gate.scenes&&gate.scenes[bestName])return gate.scenes[bestName];
   return gate.scenes?.default||null;
 }
 
@@ -635,17 +742,14 @@ function showScene(){
   const s=sceneNow();
   if(!s){console.error("Scène introuvable:",currentSceneId);return;}
 
-  /* ── AFFINITY GATE : redirection immédiate selon affinité ── */
+  /* ── AFFINITY GATE ── */
   if(s.affinity_gate){
     const target=resolveAffinityGate(s.affinity_gate);
     if(target&&chData.scenes[target]){
-      sceneHistory.push(currentSceneId);
-      currentSceneId=target;showScene();return;
+      sceneHistory.push(currentSceneId);currentSceneId=target;showScene();return;
     }else if(target){
-      /* La cible est dans un autre chapitre ou un ending */
       const match=target.match(/^c(\d+)_s/);
       if(match){loadChapterAndScene(parseInt(match[1]),target);return;}
-      /* Sinon considère comme ending JSON */
       loadEndingJson(target);return;
     }
   }
@@ -673,7 +777,6 @@ function showScene(){
   if(s.music)playMusic(s.music);
   setChars(s);
 
-  /* Bouton Revenir désactivé pendant les endings */
   document.getElementById("btn-back").style.display=isEnding?"none":"flex";
 
   const spk=document.getElementById("spk");
@@ -689,12 +792,23 @@ function showScene(){
     if(s.choices&&s.choices.length>0){
       renderChoices(s);
     }else if(!s.next){
-      /* Pas de "next" défini : fin de chapitre ou fin du jeu */
       handleChapterEnd();
     }
   });
   updateProgress();
   requestAnimationFrame(()=>requestAnimationFrame(repositionCharsAndChoices));
+
+  /* ══ PERF : précharge les assets de la scène suivante en arrière-plan ══ */
+  if(s.next){
+    /* setTimeout pour ne pas bloquer le rendu en cours */
+    setTimeout(()=>preloadSceneAssets(s.next, 2), 200);
+  }
+
+  /* ══ PERF : précharge le chapitre suivant quand on a vu assez de scènes ══ */
+  scenesViewedInChapter++;
+  if(scenesViewedInChapter === 8){
+    setTimeout(()=>prefetchNextChapter(currentChapter+1), 1500);
+  }
 }
 
 function updateBackBtn(){
@@ -705,7 +819,6 @@ function updateBackBtn(){
 
 /* ════════════════════════════════════════════
    CHOICES
-   Supporte : affection_target + affection_delta (visible en indice si défini)
    ════════════════════════════════════════════ */
 function renderChoices(s){
   const area=document.getElementById("choices");area.innerHTML="";
@@ -714,18 +827,13 @@ function renderChoices(s){
   s.choices.forEach(c=>{
     if(!c.label)return;
     const btn=document.createElement("button");btn.className="cbtn";
-
-    /* Label principal */
     const span=document.createElement("span");span.textContent=c.label;btn.appendChild(span);
-
-    /* Indice d'affinité (optionnel) */
     if(c.affection_target&&c.affection_delta!==undefined){
       const hint=document.createElement("span");
       hint.className="aff-hint"+(c.affection_delta>=0?" pos":" neg");
       hint.textContent=`(${c.affection_delta>=0?"+":""}${c.affection_delta} ${c.affection_target})`;
       btn.appendChild(hint);
     }
-
     btn.onclick=(e)=>{
       e.stopPropagation();
       area.style.display="none";
@@ -737,6 +845,10 @@ function renderChoices(s){
     };
     area.appendChild(btn);
   });
+  /* ══ PERF : précharge les scènes de tous les choix ══ */
+  setTimeout(()=>{
+    s.choices.forEach(c=>{if(c.next_scene)preloadSceneAssets(c.next_scene,1);});
+  }, 300);
   repositionCharsAndChoices();
 }
 
@@ -751,7 +863,6 @@ function onDialogClick(){
     }
     const match=s.next.match(/^c(\d+)_s/);
     if(match){loadChapterAndScene(parseInt(match[1]),s.next);return;}
-    /* next pointe vers un JSON d'ending */
     if(s.next.startsWith("ending_")||s.next.endsWith(".json")){loadEndingJson(s.next);return;}
     showToast("Scène introuvable : "+s.next);
   }
@@ -764,123 +875,86 @@ function prevScene(){
 
 /* ════════════════════════════════════════════
    FIN DE CHAPITRE
-   Essaie de charger le chapitre suivant.
-   Si c'est le dernier, calcule l'affinité et déclenche le bon ending.
    ════════════════════════════════════════════ */
 async function handleChapterEnd(){
   updateProgress();
   const nextChapter=currentChapter+1;
+  const url="json/chapter"+nextChapter+".json";
 
-  /* Tentative de chargement du chapitre suivant */
   try{
-    const r=await fetch("json/chapter"+nextChapter+".json?v="+Date.now());
-    if(r.ok){
-      const data=await r.json();
-      /* Vérifie que le JSON contient bien des scènes (même si peu) */
-      if(data.scenes&&Object.keys(data.scenes).length>0){
-        chData=data;
-        currentChapter=nextChapter;currentSceneId=chData.start;sceneHistory=[];
-        save.currentChapter=nextChapter;save.currentSceneId=currentSceneId;
-        if(!save.unlockedChapters.includes(nextChapter))save.unlockedChapters.push(nextChapter);
-        persistSave();
-        document.getElementById("top-title").textContent=(chData.title||"").substring(0,32);
-        initGauges(chData.scenes);introSkip=false;showIntro(chData);
-        const wait=setInterval(()=>{if(document.getElementById("ch-intro").style.display==="none"){clearInterval(wait);showScene();}},80);
-        return;
-      }
+    /* Le JSON est peut-être déjà dans le cache mémoire grâce au prefetch ! */
+    const data=await fetchJSON(url);
+    if(data.scenes&&Object.keys(data.scenes).length>0){
+      chData=data;
+      currentChapter=nextChapter;currentSceneId=chData.start;sceneHistory=[];
+      scenesViewedInChapter=0;
+      save.currentChapter=nextChapter;save.currentSceneId=currentSceneId;
+      if(!save.unlockedChapters.includes(nextChapter))save.unlockedChapters.push(nextChapter);
+      persistSave();
+      document.getElementById("top-title").textContent=(chData.title||"").substring(0,32);
+      initGauges(chData.scenes);introSkip=false;showIntro(chData);
+      const wait=setInterval(()=>{if(document.getElementById("ch-intro").style.display==="none"){clearInterval(wait);showScene();}},80);
+      return;
     }
-  }catch(e){console.warn("Chapitre suivant non disponible:",e);}
+  }catch(e){console.warn("Chapitre suivant non disponible :",e);}
 
-  /* Pas de chapitre suivant → calcul d'ending */
   triggerEndingCalculation();
 }
 
 /* ════════════════════════════════════════════
    CALCUL D'ENDING
-   Détermine quel ending charger selon l'affinité.
-   Le fichier ending attendu : json/ending_{nom}.json ou json/ending_neutral.json
    ════════════════════════════════════════════ */
 async function triggerEndingCalculation(){
-  isEnding=true;
-  updateBackBtn();
-
-  /* Trouve le LI avec la plus haute affinité */
+  isEnding=true;updateBackBtn();
   let bestName=null,bestVal=-Infinity;
   for(const[name,val] of Object.entries(save.affection)){
     if(val>bestVal){bestVal=val;bestName=name;}
   }
-
-  /* Seuil minimum pour déclencher un ending romantique */
   const threshold=SEUIL_KHEPRY_DEFAULT;
-
   if(bestName&&bestVal>=threshold){
-    /* Ending romantique */
-    const endingFile=`ending_${bestName.toLowerCase()}.json`;
-    await loadEndingJson(endingFile,bestName,bestVal);
+    await loadEndingJson(`ending_${bestName.toLowerCase()}.json`,bestName,bestVal);
   }else{
-    /* Ending neutre */
     await loadEndingJson("ending_neutral.json",null,0);
   }
 }
 
 /* ════════════════════════════════════════════
    CHARGEMENT D'UN ENDING JSON
-   Format du JSON d'ending : voir exemple plus bas.
-   Peut contenir des scènes normales, puis un "ending_result".
    ════════════════════════════════════════════ */
 async function loadEndingJson(fileOrName,winnerName,winnerVal){
-  /* Normalise le nom du fichier */
   let file=fileOrName;
   if(!file.endsWith(".json"))file=`json/${file}`;
   else if(!file.startsWith("json/"))file=`json/${file}`;
 
   try{
-    const r=await fetch(file+"?v="+Date.now());
-    if(!r.ok)throw new Error("404");
-    const data=await r.json();
+    const data=await fetchJSON(file);
 
-    /* Si l'ending a des scènes narrées (optionnel) */
     if(data.scenes&&data.start){
-      chData=data;
-      currentSceneId=chData.start;
-      sceneHistory=[];
-      isEnding=true;
+      chData=data;currentSceneId=chData.start;sceneHistory=[];isEnding=true;
       document.getElementById("top-title").textContent=(data.title||"Épilogue").substring(0,32);
-      /* Pas d'intro pour les endings */
       document.getElementById("ch-intro").style.display="none";
-
-      /* Khepry avant les scènes si seuil atteint */
       if(data.khepry_target&&data.khepry_threshold!==undefined){
         const tv=save.affection[data.khepry_target]??0;
         if(tv>=data.khepry_threshold&&!persistent.khepry[data.khepry_target]){
-          awardKhepry(data.khepry_target,()=>showScene());
-          return;
+          awardKhepry(data.khepry_target,()=>showScene());return;
         }
       }
-      showScene();
-      return;
+      showScene();return;
     }
 
-    /* Ending direct (pas de scènes, juste les métadonnées) */
     if(data.ending_result){
       const res=data.ending_result;
-      /* Khepry */
       if(res.khepry_target&&res.khepry_threshold!==undefined){
         const tv=save.affection[res.khepry_target]??winnerVal??0;
         if(tv>=(res.khepry_threshold||SEUIL_KHEPRY_DEFAULT)&&!persistent.khepry[res.khepry_target]){
-          awardKhepry(res.khepry_target,()=>showEndingScreen(res));
-          return;
+          awardKhepry(res.khepry_target,()=>showEndingScreen(res));return;
         }
       }
       showEndingScreen(res);
     }
   }catch(e){
-    console.warn("Ending JSON introuvable, affichage fallback :",file,e);
-    showEndingScreen({
-      tag:"✦ Fin",
-      title:"À suivre…",
-      description:"Ton histoire continue dans les prochains chapitres."
-    });
+    console.warn("Ending JSON introuvable, fallback :",file,e);
+    showEndingScreen({tag:"✦ Fin",title:"À suivre…",description:"Ton histoire continue dans les prochains chapitres."});
   }
 }
 
@@ -892,14 +966,10 @@ function showEndingScreen(res){
 }
 
 /* ════════════════════════════════════════════
-   RESTART — remet affinité à zéro, conserve Khepry
+   RESTART
    ════════════════════════════════════════════ */
 function restartGame(){
-  save=defaultSave();
-  gameVars={};
-  isEnding=false;
-  persistSave();
-  /* persistent.khepry conservé */
+  save=defaultSave();gameVars={};isEnding=false;persistSave();
   document.getElementById("ending-ov").style.display="none";
   loadChapter(1);
 }
@@ -909,9 +979,9 @@ function restartGame(){
    ════════════════════════════════════════════ */
 async function loadChapter(n){
   try{
-    const res=await fetch("json/chapter"+n+".json?v="+Date.now());
-    chData=await res.json();
-    currentChapter=n;currentSceneId=chData.start;sceneHistory=[];
+    const data=await fetchJSON("json/chapter"+n+".json");
+    chData=data;currentChapter=n;currentSceneId=chData.start;sceneHistory=[];
+    scenesViewedInChapter=0;
     save.currentChapter=n;save.currentSceneId=currentSceneId;
     if(!save.unlockedChapters.includes(n))save.unlockedChapters.push(n);persistSave();
     document.getElementById("top-title").textContent=(chData.title||"").substring(0,32);
@@ -922,10 +992,10 @@ async function loadChapter(n){
 
 async function loadChapterAndScene(num,sceneId){
   try{
-    const res=await fetch("json/chapter"+num+".json?v="+Date.now());
-    const newCh=await res.json();
-    if(!newCh.scenes[sceneId])throw new Error("Scène "+sceneId+" introuvable dans le chapitre "+num);
+    const newCh=await fetchJSON("json/chapter"+num+".json");
+    if(!newCh.scenes[sceneId])throw new Error("Scène "+sceneId+" introuvable");
     chData=newCh;currentChapter=num;currentSceneId=sceneId;sceneHistory=[];
+    scenesViewedInChapter=0;
     save.currentChapter=num;save.currentSceneId=sceneId;
     if(!save.unlockedChapters.includes(num))save.unlockedChapters.push(num);
     persistSave();
@@ -937,7 +1007,7 @@ async function loadChapterAndScene(num,sceneId){
 }
 
 /* ════════════════════════════════════════════
-   INTRO / FIN DE CHAPITRE
+   INTRO
    ════════════════════════════════════════════ */
 function showIntro(data){
   const el=document.getElementById("ch-intro");el.style.display="flex";el.style.opacity="1";
@@ -999,22 +1069,33 @@ document.addEventListener("keydown",e=>{
    INIT
    ════════════════════════════════════════════ */
 async function init(){
-  save=loadSave();
-  persistent=loadPersistent();
+  save=loadSave();persistent=loadPersistent();
   if(save.gameVars)gameVars=Object.assign({},save.gameVars);
   currentChapter=save.currentChapter||1;
-  try{const res=await fetch("json/chapter"+currentChapter+".json?v="+Date.now());chData=await res.json();}
-  catch(e){document.getElementById("dtxt").textContent="Erreur : impossible de charger chapter"+currentChapter+".json";console.error(e);return;}
+
+  try{
+    chData=await fetchJSON("json/chapter"+currentChapter+".json");
+  }catch(e){
+    document.getElementById("dtxt").textContent="Erreur : impossible de charger chapter"+currentChapter+".json";
+    console.error(e);return;
+  }
+
   const hasSave=save.currentSceneId&&chData.scenes&&chData.scenes[save.currentSceneId];
   currentSceneId=hasSave?save.currentSceneId:chData.start;
   sceneHistory=[];
   document.getElementById("top-title").textContent=(chData.title||"Le Livre de la Fin").substring(0,32);
   initGauges(chData.scenes);
+
   if(hasSave){
     document.getElementById("ch-intro").style.display="none";showScene();
   }else{
     introSkip=false;showIntro(chData);
     const wait=setInterval(()=>{if(document.getElementById("ch-intro").style.display==="none"){clearInterval(wait);showScene();}},80);
+  }
+
+  /* ══ PERF : précharge les assets de la 1ère scène immédiatement ══ */
+  if(chData.start){
+    setTimeout(()=>preloadSceneAssets(chData.start, 3), 0);
   }
 }
 
