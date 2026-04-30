@@ -2,41 +2,59 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-<title>Combat : Kaito - Le Livre de la Fin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Combat : Kaito</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{background:#0a0608;display:flex;justify-content:center;align-items:center;min-height:100vh;font-family:'Rajdhani',sans-serif}
-#game-root{width:100%;max-width:800px;height:520px;background:#0a0608;position:relative;overflow:hidden;border-radius:12px;box-shadow:0 0 20px rgba(0,0,0,0.5)}
+#game-root{width:100%;max-width:800px;height:520px;background:#0a0608;position:relative;overflow:hidden;border-radius:12px}
 canvas{position:absolute;top:0;left:0;width:100%;height:100%;display:block}
 #ui{position:absolute;top:0;left:0;right:0;bottom:0;pointer-events:none}
-#hud{position:absolute;top:12px;left:14px;display:flex;gap:10px;align-items:center}
-.heart{font-size:18px;transition:transform .2s}
-#phase-bar{position:absolute;top:12px;left:50%;transform:translateX(-50%);font-size:11px;letter-spacing:3px;text-transform:uppercase;color:rgba(200,180,180,.7);background:rgba(10,6,8,.7);padding:4px 14px;border-radius:20px;border:1px solid rgba(200,82,74,.25);white-space:nowrap}
-#timer-wrap{position:absolute;top:12px;right:14px;display:none;align-items:center;gap:6px}
-#timer-num{font-size:20px;font-weight:700;color:#e8d5c4;letter-spacing:1px}
-#timer-lbl{font-size:10px;letter-spacing:2px;color:rgba(200,180,180,.6);text-transform:uppercase}
-#dash-btn{position:absolute;bottom:16px;right:16px;width:68px;height:68px;border-radius:50%;background:rgba(200,82,74,.18);border:2px solid rgba(200,82,74,.5);color:#e8d5c4;font-size:11px;letter-spacing:1px;text-transform:uppercase;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px;cursor:pointer;pointer-events:all;transition:all .2s;text-align:center;line-height:1.2}
-#dash-btn:hover{background:rgba(200,82,74,.35);border-color:rgba(200,82,74,.9)}
-#dash-btn.active{background:rgba(200,82,74,.6);transform:scale(1.08)}
+
+/* HUD */
+#hud{position:absolute;top:12px;left:14px;display:flex;gap:8px;align-items:center}
+.heart{font-size:16px}
+#phase-bar{position:absolute;top:12px;left:50%;transform:translateX(-50%);font-size:10px;letter-spacing:3px;text-transform:uppercase;color:rgba(200,180,180,.7);background:rgba(10,6,8,.75);padding:4px 14px;border-radius:20px;border:1px solid rgba(200,82,74,.25);white-space:nowrap}
+#timer-wrap{position:absolute;top:12px;right:80px;display:none;align-items:center;gap:5px}
+#timer-num{font-size:20px;font-weight:700;color:#e8d5c4}
+#timer-lbl{font-size:9px;letter-spacing:2px;color:rgba(200,180,180,.6);text-transform:uppercase}
+
+/* BOUTON PAUSE */
+#pause-btn{position:absolute;top:8px;right:10px;pointer-events:all;width:36px;height:36px;border-radius:8px;background:rgba(10,6,8,.7);border:1px solid rgba(200,82,74,.3);color:#e8d5c4;font-size:13px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;z-index:20}
+#pause-btn:hover{background:rgba(80,20,20,.6)}
+
+/* PAUSE OVERLAY */
+#pause-ov{position:absolute;inset:0;z-index:30;background:rgba(10,6,8,.88);display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;pointer-events:all}
+#pause-ov h2{font-size:18px;letter-spacing:4px;text-transform:uppercase;color:#e8d5c4;margin-bottom:8px}
+.pbtn{padding:10px 30px;border-radius:9px;border:1px solid rgba(200,82,74,.4);background:rgba(40,10,10,.5);color:#e8d5c4;font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;font-family:'Rajdhani',sans-serif;width:200px}
+.pbtn:hover{background:rgba(120,20,20,.6);border-color:rgba(200,82,74,.8)}
+.pbtn.red{color:#ff7070;border-color:rgba(200,40,40,.4)}
+
+/* DASH BTN */
+#dash-btn{position:absolute;bottom:16px;right:16px;width:64px;height:64px;border-radius:50%;background:rgba(200,82,74,.18);border:2px solid rgba(200,82,74,.5);color:#e8d5c4;font-size:10px;letter-spacing:1px;text-transform:uppercase;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:2px;cursor:pointer;pointer-events:all;transition:all .2s;text-align:center;line-height:1.2}
+#dash-btn:hover{background:rgba(200,82,74,.35)}
 #dash-btn.hidden{display:none}
-#overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:rgba(10,6,8,.94);pointer-events:all;z-index:10}
+
+/* OVERLAY PRINCIPAL */
+#overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:rgba(10,6,8,.95);pointer-events:all;z-index:10}
 #overlay.hide{display:none}
-.ol-tag{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:rgba(200,82,74,.8)}
-.ol-title{font-family:'IM Fell English',serif;font-size:clamp(1.1rem,3vw,1.7rem);color:#e8d5c4;letter-spacing:.08em;text-align:center;text-shadow:0 0 30px rgba(200,82,74,.3);max-width:480px}
-.ol-desc{font-family:'IM Fell English',serif;font-style:italic;font-size:13px;color:rgba(232,213,196,.65);text-align:center;max-width:400px;line-height:1.7;margin-top:4px}
-.ol-btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:8px}
-.ol-btn{padding:10px 24px;border-radius:9px;border:1px solid rgba(200,82,74,.4);background:rgba(60,15,15,.5);color:#e8d5c4;font-size:13px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s}
+.ol-tag{font-size:11px;letter-spacing:4px;text-transform:uppercase;color:rgba(200,82,74,.85)}
+.ol-title{font-size:clamp(1rem,2.8vw,1.5rem);color:#e8d5c4;letter-spacing:.06em;text-align:center;max-width:480px;font-weight:600}
+.ol-btns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:10px}
+.ol-btn{padding:10px 26px;border-radius:9px;border:1px solid rgba(200,82,74,.4);background:rgba(60,15,15,.5);color:#e8d5c4;font-size:12px;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;font-family:'Rajdhani',sans-serif}
 .ol-btn:hover{background:rgba(120,20,20,.6);border-color:rgba(200,82,74,.8)}
 .ol-btn.primary{background:rgba(200,82,74,.25);border-color:rgba(200,82,74,.7)}
 .ol-btn.primary:hover{background:rgba(200,82,74,.5)}
-.char-pick{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;margin-top:4px}
-.cpick{width:140px;padding:16px 12px;border-radius:12px;border:1px solid rgba(200,82,74,.3);background:rgba(30,10,10,.6);color:#e8d5c4;cursor:pointer;text-align:center;transition:all .25s}
-.cpick:hover,.cpick.sel{border-color:rgba(200,82,74,.8);background:rgba(80,20,20,.5)}
-.cpick-name{font-size:14px;letter-spacing:2px;text-transform:uppercase;font-weight:600}
-.cpick-stat{font-size:11px;color:rgba(200,180,180,.6);margin-top:6px;line-height:1.6}
-.stat-bar{height:3px;background:rgba(200,82,74,.2);border-radius:2px;margin-top:3px;overflow:hidden}
-.stat-fill{height:100%;background:linear-gradient(90deg,#8b3a3a,#c8524a);border-radius:2px}
+
+/* SÉLECTION PERSONNAGES */
+.char-pick{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:2px}
+.cpick{width:130px;padding:14px 10px;border-radius:12px;border:1px solid rgba(200,82,74,.25);background:rgba(25,8,8,.7);color:#e8d5c4;cursor:pointer;text-align:center;transition:all .22s}
+.cpick:hover,.cpick.sel{border-color:rgba(200,82,74,.75);background:rgba(70,15,15,.55)}
+.cpick-name{font-size:15px;letter-spacing:2px;text-transform:uppercase;font-weight:700}
+.cpick-tag{font-size:11px;color:rgba(200,150,120,.75);margin-top:8px;line-height:1.5;font-style:italic}
+.stat-row{display:flex;align-items:center;gap:6px;margin-top:6px;font-size:10px;color:rgba(200,180,180,.6);letter-spacing:1px;text-transform:uppercase}
+.stat-bar{flex:1;height:3px;background:rgba(200,82,74,.15);border-radius:2px;overflow:hidden}
+.stat-fill{height:100%;background:linear-gradient(90deg,#7a2a2a,#c8524a);border-radius:2px}
 </style>
 </head>
 <body>
@@ -53,495 +71,463 @@ canvas{position:absolute;top:0;left:0;width:100%;height:100%;display:block}
       <div id="timer-num">10</div>
       <div id="timer-lbl">sec</div>
     </div>
+    <button id="pause-btn" onclick="togglePause()">⏸</button>
     <div id="dash-btn" class="hidden" onclick="triggerDash()">
-      <span style="font-size:16px">⚡</span>
+      <span style="font-size:15px">⚡</span>
       <span>Course</span>
     </div>
   </div>
+
+  <!-- PAUSE OVERLAY -->
+  <div id="pause-ov">
+    <h2>Pause</h2>
+    <button class="pbtn" onclick="togglePause()">▶ Reprendre</button>
+    <button class="pbtn red" onclick="goMenu()">🏠 Menu principal</button>
+  </div>
+
+  <!-- OVERLAY SELECTION / FIN -->
   <div id="overlay">
     <div class="ol-tag">✦ Combat — Kaito</div>
-    <div class="ol-title">Qui affronte Kaito ?</div>
-    <div class="ol-desc">Chaque style de combat est différent. Choisissez soigneusement.</div>
+    <div class="ol-title">Qui choisiras-tu pour combattre Kaito ?</div>
     <div class="char-pick">
       <div class="cpick" data-char="dazai">
         <div class="cpick-name">Dazai</div>
-        <div class="cpick-stat">
-          Vitesse<div class="stat-bar"><div class="stat-fill" style="width:85%"></div></div>
-          Résistance<div class="stat-bar"><div class="stat-fill" style="width:40%"></div></div>
-          <em style="font-size:10px;opacity:.7">Très rapide — 1 seule vie</em>
-        </div>
+        <div class="stat-row">Vitesse<div class="stat-bar"><div class="stat-fill" style="width:88%"></div></div></div>
+        <div class="stat-row">Vie<div class="stat-bar"><div class="stat-fill" style="width:28%"></div></div></div>
+        <div class="cpick-tag">Très rapide — 1 vie</div>
       </div>
       <div class="cpick" data-char="kunikida">
         <div class="cpick-name">Kunikida</div>
-        <div class="cpick-stat">
-          Vitesse<div class="stat-bar"><div class="stat-fill" style="width:55%"></div></div>
-          Résistance<div class="stat-bar"><div class="stat-fill" style="width:80%"></div></div>
-          <em style="font-size:10px;opacity:.7">Solide — 3 vies</em>
-        </div>
+        <div class="stat-row">Vitesse<div class="stat-bar"><div class="stat-fill" style="width:52%"></div></div></div>
+        <div class="stat-row">Vie<div class="stat-bar"><div class="stat-fill" style="width:85%"></div></div></div>
+        <div class="cpick-tag">Solide — 3 vies</div>
       </div>
     </div>
     <div class="ol-btns">
-      <button class="ol-btn primary" id="start-btn" style="opacity:.4;pointer-events:none">▶ Commencer</button>
+      <button class="ol-btn primary" id="start-btn" style="opacity:.35;pointer-events:none">▶ Commencer</button>
     </div>
   </div>
 </div>
 
 <script>
 (function(){
-  // DOM elements
-  const C = document.getElementById('gc');
-  const ctx = C.getContext('2d');
+  const C    = document.getElementById('gc');
+  const ctx  = C.getContext('2d');
   const root = document.getElementById('game-root');
-  const overlay = document.getElementById('overlay');
-  const dashBtn = document.getElementById('dash-btn');
-  const phaseBar = document.getElementById('phase-bar');
+  const overlay   = document.getElementById('overlay');
+  const dashBtn   = document.getElementById('dash-btn');
+  const phaseBar  = document.getElementById('phase-bar');
   const timerWrap = document.getElementById('timer-wrap');
-  const timerNum = document.getElementById('timer-num');
-  const h1 = document.getElementById('h1');
-  const h2 = document.getElementById('h2');
-  const h3 = document.getElementById('h3');
+  const timerNum  = document.getElementById('timer-num');
+  const pauseOv   = document.getElementById('pause-ov');
 
-  let W, H, raf, selectedChar = null, maxLives = 2, lives = 2;
-  let phase = 1, running = false, dead = false, won = false;
-  let playerX, playerY, playerW = 44, playerH = 54;
+  /* ── MUSIQUE PROPRE ── */
+  const bgm = new Audio('music/kaito_fight.mp3');
+  bgm.loop   = true;
+  bgm.volume = 0.55;
+
+  function startMusic() {
+    // Stop la musique éventuelle du parent (game.html)
+    try {
+      if (window.parent && window.parent !== window) {
+        const pm = window.parent.document.getElementById('music');
+        if (pm) { pm.pause(); pm.currentTime = 0; }
+      }
+    } catch(e){}
+    bgm.currentTime = 0;
+    bgm.play().catch(()=>{});
+  }
+  function stopMusic() {
+    bgm.pause();
+    bgm.currentTime = 0;
+  }
+
+  /* ── RESIZE ── */
+  let W, H;
+  let selectedChar = null, maxLives = 2, lives = 2;
+  let phase = 1, running = false, paused = false;
+  let playerX, playerY, playerW = 42, playerH = 52;
   let targetX, targetY;
   let filaments = [];
-  let kaitoX, kaitoY = 80, kaitoW = 50, kaitoH = 60;
-  let waveTimer = 0, waveInterval = 90;
-  let wavePattern = 0;
+  let kaitoX, kaitoY = 70, kaitoW = 48, kaitoH = 58;
+  let waveTimer = 0, waveInterval = 90, wavePattern = 0;
   let invincible = false, invTimer = 0;
   let timerSec = 10, timerMs = 0;
-  let memoryBlur = 0;
   let chargeTriggered = false;
   let screenShake = 0;
   let particles = [];
   let tick = 0;
+  let raf = null;
+  let lastTime = 0;
 
-  // Helper: roundRect
   if (!CanvasRenderingContext2D.prototype.roundRect) {
-    CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
-      if (w < 2 * r) r = w / 2;
-      if (h < 2 * r) r = h / 2;
-      this.moveTo(x+r, y);
-      this.lineTo(x+w-r, y);
-      this.quadraticCurveTo(x+w, y, x+w, y+r);
-      this.lineTo(x+w, y+h-r);
-      this.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
-      this.lineTo(x+r, y+h);
-      this.quadraticCurveTo(x, y+h, x, y+h-r);
-      this.lineTo(x, y+r);
-      this.quadraticCurveTo(x, y, x+r, y);
-      return this;
+    CanvasRenderingContext2D.prototype.roundRect = function(x,y,w,h,r){
+      if(w<2*r)r=w/2; if(h<2*r)r=h/2;
+      this.moveTo(x+r,y); this.lineTo(x+w-r,y);
+      this.quadraticCurveTo(x+w,y,x+w,y+r); this.lineTo(x+w,y+h-r);
+      this.quadraticCurveTo(x+w,y+h,x+w-r,y+h); this.lineTo(x+r,y+h);
+      this.quadraticCurveTo(x,y+h,x,y+h-r); this.lineTo(x,y+r);
+      this.quadraticCurveTo(x,y,x+r,y); return this;
     };
   }
 
-  function resize() {
+  function resize(){
     const rect = root.getBoundingClientRect();
-    W = rect.width;
-    H = rect.height;
-    C.width = W;
-    C.height = H;
-    playerX = W/2;
-    playerY = H-80;
-    targetX = playerX;
-    targetY = playerY;
-    kaitoX = W/2;
+    W = rect.width; H = rect.height;
+    C.width = W; C.height = H;
+    playerX = W/2; playerY = H-80;
+    targetX = playerX; targetY = playerY;
+    kaitoX  = W/2;
   }
-  window.addEventListener('resize', () => { resize(); });
+  window.addEventListener('resize', ()=>{ resize(); });
   resize();
 
-  // Sélection du personnage
-  const cpicks = document.querySelectorAll('.cpick');
-  cpicks.forEach(el => {
-    el.addEventListener('click', () => {
-      const char = el.getAttribute('data-char');
-      selectedChar = char;
-      cpicks.forEach(c => c.classList.remove('sel'));
+  /* ── SELECTION PERSO ── */
+  document.querySelectorAll('.cpick').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      selectedChar = el.getAttribute('data-char');
+      document.querySelectorAll('.cpick').forEach(c=>c.classList.remove('sel'));
       el.classList.add('sel');
-      const startBtn = document.getElementById('start-btn');
-      startBtn.style.opacity = '1';
-      startBtn.style.pointerEvents = 'all';
-      maxLives = char === 'kunikida' ? 3 : 1;
-      lives = maxLives;
-      updateHUD();
+      const btn = document.getElementById('start-btn');
+      btn.style.opacity = '1'; btn.style.pointerEvents = 'all';
+      maxLives = selectedChar === 'kunikida' ? 3 : 1;
+      lives = maxLives; updateHUD();
     });
   });
 
-  function updateHUD() {
-    h1.textContent = lives >= 1 ? '❤️' : '🖤';
-    h2.textContent = lives >= 2 ? '❤️' : '🖤';
-    if (maxLives >= 3) {
-      h3.style.display = 'inline';
-      h3.textContent = lives >= 3 ? '❤️' : '🖤';
+  function updateHUD(){
+    document.getElementById('h1').textContent = lives>=1?'❤️':'🖤';
+    document.getElementById('h2').textContent = lives>=2?'❤️':'🖤';
+    if(maxLives>=3){
+      document.getElementById('h3').style.display='inline';
+      document.getElementById('h3').textContent = lives>=3?'❤️':'🖤';
     } else {
-      h3.style.display = 'none';
+      document.getElementById('h3').style.display='none';
     }
   }
 
-  function startGame() {
-    if (!selectedChar) return;
+  /* ── PAUSE ── */
+  function togglePause(){
+    if(!running) return;
+    paused = !paused;
+    pauseOv.style.display = paused ? 'flex' : 'none';
+    document.getElementById('pause-btn').textContent = paused ? '▶' : '⏸';
+    if(!paused){ lastTime=0; raf=requestAnimationFrame(loop); }
+    else { cancelAnimationFrame(raf); }
+  }
+  window.togglePause = togglePause;
+
+  function goMenu(){
+    stopMusic();
+    if(window.parent && window.parent.postMessage){
+      window.parent.postMessage({type:'otome_goto', scene:'menu'},'*');
+    } else {
+      window.location.href = '../index.html';
+    }
+  }
+  window.goMenu = goMenu;
+
+  /* ── DÉMARRAGE ── */
+  function startGame(){
+    if(!selectedChar) return;
     overlay.classList.add('hide');
-    running = true;
-    phase = 1;
-    dead = false;
-    won = false;
-    lives = maxLives;
-    filaments = [];
-    particles = [];
-    memoryBlur = 0;
-    chargeTriggered = false;
-    screenShake = 0;
-    playerX = W/2;
-    playerY = H-80;
-    targetX = playerX;
-    targetY = playerY;
-    kaitoX = W/2;
-    kaitoY = 80;
-    waveTimer = 0;
-    wavePattern = 0;
-    waveInterval = 90;
-    timerSec = 10;
-    timerMs = 0;
+    running = true; paused = false;
+    phase = 1; lives = maxLives;
+    filaments=[]; particles=[]; screenShake=0;
+    chargeTriggered=false; waveTimer=0; wavePattern=0; waveInterval=90;
+    timerSec=10; timerMs=0; tick=0;
+    playerX=W/2; playerY=H-80;
+    targetX=playerX; targetY=playerY;
+    kaitoX=W/2; kaitoY=70;
     updateHUD();
     dashBtn.classList.remove('hidden');
     phaseBar.textContent = 'Phase 1 — Esquive';
     timerWrap.style.display = 'none';
-    if (raf) cancelAnimationFrame(raf);
+    startMusic();
+    if(raf) cancelAnimationFrame(raf);
+    lastTime=0;
     raf = requestAnimationFrame(loop);
   }
 
-  function triggerDash() {
-    if (!running || chargeTriggered || phase !== 1) return;
+  function triggerDash(){
+    if(!running||chargeTriggered||phase!==1||paused) return;
     dashBtn.classList.add('hidden');
-    chargeTriggered = true;
-    setTimeout(() => startPhase2(), 400);
+    chargeTriggered=true;
+    setTimeout(()=>startPhase2(), 400);
+  }
+  window.triggerDash = triggerDash;
+
+  function startPhase2(){
+    phase=2;
+    phaseBar.textContent='Phase 2 — Course vers Kaito';
+    timerWrap.style.display='flex';
+    timerNum.textContent=timerSec;
+    timerMs=0;
+    targetY=H-80; playerY=H-80;
   }
 
-  function startPhase2() {
-    phase = 2;
-    phaseBar.textContent = 'Phase 2 — Course vers Kaito';
-    timerWrap.style.display = 'flex';
-    timerNum.textContent = timerSec;
-    timerMs = 0;
-    targetY = H-80;
-    playerY = H-80;
-  }
-
-  function spawnWave() {
-    const spd = 1.8 + (wavePattern * 0.3) + (phase === 2 ? 1.5 : 0);
-    const p = wavePattern % 5;
-    if (p === 0) {
-      for (let i = 0; i < 5; i++) {
-        filaments.push({ x: -20, y: H * (0.5 + Math.random() * 0.45), dx: spd + Math.random() * 0.5, dy: (Math.random() - 0.5) * 0.5, w: 22, h: 4, r: 0, mem: false });
-      }
-    } else if (p === 1) {
-      for (let i = 0; i < 6; i++) {
-        filaments.push({ x: W * (i / 5.5), y: -20, dx: (Math.random() - 0.5) * 0.4, dy: spd, w: 4, h: 22, r: 0, mem: false });
-      }
-    } else if (p === 2) {
-      filaments.push({ x: -20, y: H * 0.55, dx: spd + 0.5, dy: spd * 0.6, w: 24, h: 4, r: 0.4, mem: false });
-      filaments.push({ x: W + 20, y: H * 0.55, dx: -spd - 0.5, dy: spd * 0.6, w: 24, h: 4, r: -0.4, mem: false });
-      filaments.push({ x: W / 2, y: -20, dx: 0, dy: spd + 0.5, w: 4, h: 24, r: 0, mem: false });
-    } else if (p === 3) {
-      for (let i = 0; i < 4; i++) {
-        const ang = Math.random() * Math.PI * 2;
-        filaments.push({ x: kaitoX, y: kaitoY + 40, dx: Math.cos(ang) * (spd + 1), dy: Math.sin(ang) * (spd + 1) + 0.5, w: 18, h: 4, r: ang, mem: false });
+  /* ── SPAWN VAGUE ── */
+  function spawnWave(){
+    const spd = 1.8 + (wavePattern*0.25) + (phase===2?1.2:0);
+    const p = wavePattern%5;
+    if(p===0){
+      for(let i=0;i<4;i++)
+        filaments.push({x:-18,y:H*(0.5+Math.random()*0.42),dx:spd+Math.random()*0.4,dy:(Math.random()-.5)*0.4,w:20,h:4,r:0,mem:false});
+    } else if(p===1){
+      for(let i=0;i<5;i++)
+        filaments.push({x:W*(i/4.5),y:-18,dx:(Math.random()-.5)*0.3,dy:spd,w:4,h:20,r:0,mem:false});
+    } else if(p===2){
+      filaments.push({x:-18,y:H*0.55,dx:spd+0.4,dy:spd*0.55,w:22,h:4,r:0.35,mem:false});
+      filaments.push({x:W+18,y:H*0.55,dx:-spd-0.4,dy:spd*0.55,w:22,h:4,r:-0.35,mem:false});
+      filaments.push({x:W/2,y:-18,dx:0,dy:spd+0.4,w:4,h:22,r:0,mem:false});
+    } else if(p===3){
+      for(let i=0;i<3;i++){
+        const ang=Math.random()*Math.PI*2;
+        filaments.push({x:kaitoX,y:kaitoY+38,dx:Math.cos(ang)*(spd+0.8),dy:Math.sin(ang)*(spd+0.8)+0.4,w:16,h:4,r:ang,mem:false});
       }
     } else {
-      filaments.push({ x: kaitoX, y: kaitoY + 40, dx: (Math.random() - 0.5) * 3, dy: spd + Math.random() * 1.5, w: 16, h: 4, r: 0, mem: true });
+      filaments.push({x:kaitoX,y:kaitoY+38,dx:(Math.random()-.5)*2.5,dy:spd+Math.random()*1.2,w:15,h:4,r:0,mem:true});
     }
-    if (phase === 2) {
-      for (let i = 0; i < 3; i++) {
-        const side = Math.floor(Math.random() * 3);
-        let fx, fy, fdx, fdy;
-        if (side === 0) { fx = Math.random() * W; fy = -20; fdx = (Math.random() - 0.5); fdy = spd + 1; }
-        else if (side === 1) { fx = -20; fy = Math.random() * H * 0.7; fdx = spd + 1; fdy = (Math.random() - 0.5); }
-        else { fx = W + 20; fy = Math.random() * H * 0.7; fdx = -spd - 1; fdy = (Math.random() - 0.5); }
-        filaments.push({ x: fx, y: fy, dx: fdx, dy: fdy, w: 18, h: 4, r: 0, mem: Math.random() > 0.6 });
+    if(phase===2){
+      for(let i=0;i<2;i++){
+        const side=Math.floor(Math.random()*3);
+        let fx,fy,fdx,fdy;
+        if(side===0){fx=Math.random()*W;fy=-18;fdx=(Math.random()-.5);fdy=spd+0.8;}
+        else if(side===1){fx=-18;fy=Math.random()*H*0.7;fdx=spd+0.8;fdy=(Math.random()-.5);}
+        else{fx=W+18;fy=Math.random()*H*0.7;fdx=-spd-0.8;fdy=(Math.random()-.5);}
+        filaments.push({x:fx,y:fy,dx:fdx,dy:fdy,w:16,h:4,r:0,mem:Math.random()>0.65});
       }
     }
     wavePattern++;
   }
 
-  function hitTest(f) {
-    if (invincible) return false;
-    const px = playerX - playerW / 2, py = playerY - playerH / 2;
-    const fx = f.x - f.w / 2, fy = f.y - f.h / 2;
-    return (px < fx + f.w && px + playerW > fx && py < fy + f.h && py + playerH > fy);
+  function hitTest(f){
+    if(invincible) return false;
+    const px=playerX-playerW/2, py=playerY-playerH/2;
+    const fx=f.x-f.w/2,      fy=f.y-f.h/2;
+    return(px<fx+f.w&&px+playerW>fx&&py<fy+f.h&&py+playerH>fy);
   }
 
-  function takeHit() {
-    if (invincible) return;
-    lives--;
-    updateHUD();
-    invincible = true;
-    invTimer = 60;
-    screenShake = 12;
-    for (let i = 0; i < 8; i++) {
-      particles.push({ x: playerX, y: playerY, dx: (Math.random() - 0.5) * 4, dy: -Math.random() * 3 - 1, life: 30, maxLife: 30, r: Math.random() * 6 + 2, col: 'rgba(200,82,74,0.9)' });
-    }
-    if (lives <= 0) {
-      endFight(false);
-    }
+  function takeHit(){
+    if(invincible) return;
+    lives--; updateHUD();
+    invincible=true; invTimer=60;
+    screenShake=10;
+    for(let i=0;i<6;i++)
+      particles.push({x:playerX,y:playerY,dx:(Math.random()-.5)*3.5,dy:-Math.random()*2.5-0.8,life:28,maxLife:28,r:Math.random()*5+2,col:'rgba(200,82,74,0.9)'});
+    if(lives<=0) endFight();
   }
 
-  function kaitoHit() {
-    endFight(false);
-  }
-
-  function endFight(success) {
-    running = false;
+  function endFight(){
+    running=false;
     dashBtn.classList.add('hidden');
-    timerWrap.style.display = 'none';
+    timerWrap.style.display='none';
+    cancelAnimationFrame(raf);
+    stopMusic();
     showEndScreen();
   }
 
-  function showEndScreen() {
+  function showEndScreen(){
     overlay.classList.remove('hide');
-    const charName = selectedChar === 'dazai' ? 'Dazai' : 'Kunikida';
-    overlay.innerHTML = `
-      <div class="ol-tag">✦ ${charName}</div>
-      <div class="ol-title" style="font-style:italic;">« ${selectedChar === 'dazai' ? "Ah. C'est ainsi que ça finit…" : "Ce n'est pas terminé."} »</div>
-      <div class="ol-desc">Kaito invoque une dernière décharge mémorielle. Les souvenirs de l'entrepôt s'effacent, comme une page qu'on arrache.</div>
-      <div style="margin-top:12px;font-size:13px;letter-spacing:3px;text-transform:uppercase;color:rgba(200,82,74,.7)">Dazai et Kunikida s'effondrent — mémoire effacée.</div>
-      <div class="ol-btns" style="margin-top:16px">
-        <button class="ol-btn primary" id="continueBtn">Continuer l'histoire ▶</button>
+    overlay.innerHTML=`
+      <div class="ol-tag">✦ Combat terminé</div>
+      <div class="ol-title" style="font-style:italic;max-width:420px;line-height:1.5">
+        Dazai et Kunikida s'effondrent.<br>Kaito efface leur mémoire.
+      </div>
+      <div class="ol-btns" style="margin-top:18px">
+        <button class="ol-btn" onclick="restartFromEnd()">↺ Rejouer</button>
+        <button class="ol-btn primary" onclick="continueStory()">Continuer ▶</button>
       </div>
     `;
-    document.getElementById('continueBtn').addEventListener('click', continueStory);
   }
 
-  function continueStory() {
-    if (window.parent && window.parent.postMessage) {
-      window.parent.postMessage({ type: 'otome_goto', scene: 'c1_s72' }, '*');
+  window.restartFromEnd = function(){
+    overlay.innerHTML='';
+    overlay.classList.add('hide');
+    // Réinitialise et repart sur l'écran de sélection
+    location.reload();
+  };
+
+  window.continueStory = function(){
+    stopMusic();
+    if(window.parent&&window.parent.postMessage){
+      window.parent.postMessage({type:'otome_goto',scene:'c1_s72'},'*');
     }
-    // Fallback si pas parent
-    overlay.innerHTML = '<div class="ol-tag">Retour...</div><div class="ol-title">Vous allez être redirigé.</div>';
+  };
+
+  /* ── CONTRÔLES ── */
+  let mouseDown=false;
+  root.addEventListener('touchstart',(e)=>{
+    if(!running||paused) return;
+    const t=e.touches[0], rect=root.getBoundingClientRect();
+    targetX=Math.max(24,Math.min(W-24,t.clientX-rect.left));
+    targetY=Math.max(phase===1?H/2:40,Math.min(H-30,t.clientY-rect.top));
+    e.preventDefault();
+  },{passive:false});
+  root.addEventListener('touchmove',(e)=>{
+    if(!running||paused) return;
+    const t=e.touches[0], rect=root.getBoundingClientRect();
+    targetX=Math.max(24,Math.min(W-24,t.clientX-rect.left));
+    targetY=Math.max(phase===1?H/2:40,Math.min(H-30,t.clientY-rect.top));
+    e.preventDefault();
+  },{passive:false});
+  root.addEventListener('mousedown',(e)=>{
+    mouseDown=true;
+    if(!running||paused) return;
+    const rect=root.getBoundingClientRect();
+    targetX=Math.max(24,Math.min(W-24,e.clientX-rect.left));
+    targetY=Math.max(phase===1?H/2:40,Math.min(H-30,e.clientY-rect.top));
+  });
+  window.addEventListener('mouseup',()=>{ mouseDown=false; });
+  root.addEventListener('mousemove',(e)=>{
+    if(!running||!mouseDown||paused) return;
+    const rect=root.getBoundingClientRect();
+    targetX=Math.max(24,Math.min(W-24,e.clientX-rect.left));
+    targetY=Math.max(phase===1?H/2:40,Math.min(H-30,e.clientY-rect.top));
+  });
+
+  /* ── DESSIN ── */
+  function drawBg(){
+    ctx.fillStyle='#0c080b';
+    ctx.fillRect(0,0,W,H);
+    ctx.strokeStyle='rgba(200,82,74,0.035)';
+    ctx.lineWidth=1;
+    for(let y=0;y<H;y+=28){
+      ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
+    }
   }
 
-  // Contrôles tactiles/souris
-  let lastTouch = { x: 0, y: 0 };
-  root.addEventListener('touchstart', (e) => {
-    if (!running) return;
-    const t = e.touches[0];
-    const rect = root.getBoundingClientRect();
-    lastTouch = { x: t.clientX - rect.left, y: t.clientY - rect.top };
-    e.preventDefault();
-  }, { passive: false });
-  root.addEventListener('touchmove', (e) => {
-    if (!running) return;
-    const t = e.touches[0];
-    const rect = root.getBoundingClientRect();
-    let mx = t.clientX - rect.left;
-    let my = t.clientY - rect.top;
-    if (phase === 1) {
-      targetX = Math.max(24, Math.min(W - 24, mx));
-      targetY = Math.max(H / 2, Math.min(H - 30, my));
-    } else {
-      targetX = Math.max(24, Math.min(W - 24, mx));
-      targetY = Math.max(40, Math.min(H - 30, my));
-    }
-    e.preventDefault();
-  }, { passive: false });
-
-  let mouseDown = false;
-  root.addEventListener('mousemove', (e) => {
-    if (!running || !mouseDown) return;
-    const rect = root.getBoundingClientRect();
-    let mx = e.clientX - rect.left;
-    let my = e.clientY - rect.top;
-    if (phase === 1) {
-      targetX = Math.max(24, Math.min(W - 24, mx));
-      targetY = Math.max(H / 2, Math.min(H - 30, my));
-    } else {
-      targetX = Math.max(24, Math.min(W - 24, mx));
-      targetY = Math.max(40, Math.min(H - 30, my));
-    }
-  });
-  root.addEventListener('mousedown', (e) => {
-    mouseDown = true;
-    const rect = root.getBoundingClientRect();
-    targetX = e.clientX - rect.left;
-    targetY = e.clientY - rect.top;
-  });
-  window.addEventListener('mouseup', () => { mouseDown = false; });
-
-  // Dessin
-  function drawBackground() {
-    const grad = ctx.createLinearGradient(0, 0, 0, H);
-    grad.addColorStop(0, '#0e080c');
-    grad.addColorStop(1, '#14090e');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, W, H);
-    ctx.strokeStyle = 'rgba(200,82,74,0.04)';
-    ctx.lineWidth = 1;
-    for (let y = 0; y < H; y += 30) {
+  function drawKaito(){
+    const gy=Math.sin(tick*0.04)*3;
+    const cy=kaitoY+gy;
+    // Aura — dégradé radial au lieu de shadowBlur
+    const grad=ctx.createRadialGradient(kaitoX,cy+kaitoH/2,0,kaitoX,cy+kaitoH/2,kaitoW*1.1);
+    grad.addColorStop(0,'rgba(160,90,200,0.22)');
+    grad.addColorStop(1,'rgba(160,90,200,0)');
+    ctx.fillStyle=grad;
+    ctx.beginPath();
+    ctx.ellipse(kaitoX,cy+kaitoH/2,kaitoW,kaitoH*0.6,0,0,Math.PI*2);
+    ctx.fill();
+    // Corps
+    ctx.fillStyle='rgba(215,195,255,0.88)';
+    ctx.beginPath();
+    ctx.roundRect(kaitoX-21,cy-kaitoH/2,42,kaitoH,7);
+    ctx.fill();
+    // Label
+    ctx.fillStyle='rgba(25,8,38,0.75)';
+    ctx.font='bold 10px sans-serif';
+    ctx.textAlign='center';
+    ctx.fillText('KAITO',kaitoX,cy+4);
+    // Orbites
+    for(let i=0;i<3;i++){
+      const a=tick*0.05+i*Math.PI*0.66;
+      const r=kaitoW*0.85+Math.sin(tick*0.08+i)*4;
+      ctx.strokeStyle=`rgba(180,100,220,${0.35+0.15*Math.sin(tick*0.1+i)})`;
+      ctx.lineWidth=1.2;
       ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(W, y);
+      ctx.arc(kaitoX,cy,r,a,a+Math.PI*0.5);
       ctx.stroke();
     }
   }
 
-  function drawKaito() {
+  function drawFilament(f){
     ctx.save();
-    const gy = Math.sin(tick * 0.04) * 4;
-    const gy2 = kaitoY + gy;
-    ctx.shadowColor = 'rgba(180,100,220,0.5)';
-    ctx.shadowBlur = 20;
-    ctx.fillStyle = 'rgba(160,90,200,0.25)';
-    ctx.beginPath();
-    ctx.ellipse(kaitoX, gy2 + kaitoH / 2, kaitoW * 0.6, kaitoH * 0.55, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.shadowBlur = 0;
-    ctx.fillStyle = 'rgba(220,200,255,0.9)';
-    ctx.beginPath();
-    ctx.roundRect(kaitoX - 22, gy2 - kaitoH / 2, 44, kaitoH, 8);
-    ctx.fill();
-    ctx.fillStyle = 'rgba(30,10,40,0.7)';
-    ctx.font = 'bold 11px "Rajdhani", sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('KAITO', kaitoX, gy2 + 4);
-    for (let i = 0; i < 3; i++) {
-      const a = tick * 0.05 + i * Math.PI * 0.66;
-      const r = kaitoW * 0.8 + Math.sin(tick * 0.08) * 6;
-      ctx.strokeStyle = `rgba(180,100,220,${0.4 + 0.2 * Math.sin(tick * 0.1 + i)})`;
-      ctx.lineWidth = 1.5;
-      ctx.beginPath();
-      ctx.arc(kaitoX, gy2, r, a, a + Math.PI * 0.5);
-      ctx.stroke();
-    }
+    ctx.translate(f.x,f.y); ctx.rotate(f.r);
+    ctx.fillStyle=f.mem?'rgba(200,140,255,0.82)':'rgba(175,195,195,0.68)';
+    ctx.fillRect(-f.w/2,-f.h/2,f.w,f.h);
     ctx.restore();
   }
 
-  function drawFilament(f) {
+  function drawPlayer(){
     ctx.save();
-    ctx.translate(f.x, f.y);
-    ctx.rotate(f.r);
-    if (f.mem) {
-      ctx.shadowColor = 'rgba(180,100,220,0.8)';
-      ctx.shadowBlur = 10;
-      ctx.fillStyle = 'rgba(200,140,255,0.85)';
-    } else {
-      ctx.fillStyle = 'rgba(180,200,200,0.7)';
-    }
-    ctx.fillRect(-f.w / 2, -f.h / 2, f.w, f.h);
-    ctx.restore();
-  }
-
-  function drawPlayer() {
-    ctx.save();
-    let alpha = 1;
-    if (invincible && Math.floor(tick / 4) % 2 === 0) alpha = 0.3;
-    ctx.globalAlpha = alpha;
-    const name = selectedChar === 'dazai' ? 'DAZAI' : 'KUNIKIDA';
-    const col = selectedChar === 'dazai' ? 'rgba(200,180,140,0.9)' : 'rgba(140,180,200,0.9)';
-    ctx.shadowColor = selectedChar === 'dazai' ? 'rgba(200,150,80,0.5)' : 'rgba(80,150,200,0.5)';
-    ctx.shadowBlur = 14;
-    ctx.fillStyle = col;
+    ctx.globalAlpha=(invincible&&Math.floor(tick/4)%2===0)?0.28:1;
+    const col=selectedChar==='dazai'?'rgba(200,180,140,0.9)':'rgba(130,175,200,0.9)';
+    // Lueur légère via radial gradient au lieu de shadowBlur
+    const glow=ctx.createRadialGradient(playerX,playerY,0,playerX,playerY,playerW);
+    glow.addColorStop(0,selectedChar==='dazai'?'rgba(200,150,80,0.18)':'rgba(80,150,200,0.18)');
+    glow.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=glow;
     ctx.beginPath();
-    ctx.roundRect(playerX - playerW / 2, playerY - playerH / 2, playerW, playerH, 8);
+    ctx.ellipse(playerX,playerY,playerW,playerH/2,0,0,Math.PI*2);
     ctx.fill();
-    ctx.shadowBlur = 0;
-    ctx.fillStyle = 'rgba(10,6,8,0.7)';
-    ctx.font = 'bold 9px "Rajdhani", sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText(name.substring(0, 3), playerX, playerY + 3);
-    ctx.globalAlpha = 1;
+    // Corps
+    ctx.fillStyle=col;
+    ctx.beginPath();
+    ctx.roundRect(playerX-playerW/2,playerY-playerH/2,playerW,playerH,7);
+    ctx.fill();
+    // Label
+    ctx.fillStyle='rgba(10,6,8,0.7)';
+    ctx.font='bold 8px sans-serif';
+    ctx.textAlign='center';
+    ctx.fillText((selectedChar==='dazai'?'DAZ':'KUN'),playerX,playerY+3);
+    ctx.globalAlpha=1;
     ctx.restore();
   }
 
-  function loop() {
-    if (!running) return;
+  /* ── LOOP (cap 60fps) ── */
+  function loop(ts){
+    if(!running||paused) return;
+    // Cap 60fps
+    if(ts-lastTime<15.5){ raf=requestAnimationFrame(loop); return; }
+    lastTime=ts;
     tick++;
-    ctx.clearRect(0, 0, W, H);
+    ctx.clearRect(0,0,W,H);
 
-    let sx = 0, sy = 0;
-    if (screenShake > 0) {
-      sx = (Math.random() - 0.5) * screenShake;
-      sy = (Math.random() - 0.5) * screenShake;
-      screenShake *= 0.75;
+    let sx=0,sy=0;
+    if(screenShake>0.5){
+      sx=(Math.random()-.5)*screenShake;
+      sy=(Math.random()-.5)*screenShake;
+      screenShake*=0.72;
     }
     ctx.save();
-    if (sx !== 0 || sy !== 0) ctx.translate(sx, sy);
+    if(sx||sy) ctx.translate(sx,sy);
 
-    drawBackground();
+    drawBg();
     drawKaito();
 
     waveTimer++;
-    if (waveTimer >= waveInterval) {
-      waveTimer = 0;
-      spawnWave();
-    }
-    if (waveInterval > 40) waveInterval = Math.max(40, 90 - wavePattern * 3);
+    if(waveTimer>=waveInterval){ waveTimer=0; spawnWave(); }
+    if(waveInterval>42) waveInterval=Math.max(42,90-wavePattern*2.5);
 
-    filaments = filaments.filter(f => {
-      f.x += f.dx;
-      f.y += f.dy;
-      if (f.x < -60 || f.x > W + 60 || f.y < -60 || f.y > H + 60) return false;
+    filaments=filaments.filter(f=>{
+      f.x+=f.dx; f.y+=f.dy;
+      if(f.x<-60||f.x>W+60||f.y<-60||f.y>H+60) return false;
       drawFilament(f);
-      if (hitTest(f)) takeHit();
+      if(hitTest(f)) takeHit();
       return true;
     });
 
-    if (phase === 2) {
-      timerMs += 1000 / 60;
-      const secLeft = Math.max(0, timerSec - Math.floor(timerMs / 1000));
-      timerNum.textContent = secLeft;
-      if (timerMs >= timerSec * 1000) endFight(false);
-      const dist = Math.hypot(playerX - kaitoX, playerY - (kaitoY + kaitoH));
-      if (dist < 30) kaitoHit();
-      memoryBlur = Math.min(1, (timerMs / (timerSec * 1000)) * 0.7);
+    if(phase===2){
+      timerMs+=1000/60;
+      const secLeft=Math.max(0,timerSec-Math.floor(timerMs/1000));
+      timerNum.textContent=secLeft;
+      if(timerMs>=timerSec*1000){ endFight(); return; }
+      // Victoire si le joueur touche Kaito
+      const dist=Math.hypot(playerX-kaitoX,playerY-(kaitoY+kaitoH/2));
+      if(dist<32){ endFight(); return; }
     }
 
-    const speed = selectedChar === 'dazai' ? 0.28 : 0.22;
-    playerX += (targetX - playerX) * speed;
-    playerY += (targetY - playerY) * speed;
+    const spd=selectedChar==='dazai'?0.27:0.21;
+    playerX+=(targetX-playerX)*spd;
+    playerY+=(targetY-playerY)*spd;
 
-    if (invincible) {
-      invTimer--;
-      if (invTimer <= 0) invincible = false;
-    }
+    if(invincible){ invTimer--; if(invTimer<=0) invincible=false; }
 
-    particles = particles.filter(p => {
-      p.x += p.dx;
-      p.y += p.dy;
-      p.dy += 0.15;
-      p.life--;
-      ctx.globalAlpha = p.life / p.maxLife * 0.8;
-      ctx.fillStyle = p.col;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.globalAlpha = 1;
-      return p.life > 0;
+    // Particules
+    particles=particles.filter(p=>{
+      p.x+=p.dx; p.y+=p.dy; p.dy+=0.12; p.life--;
+      ctx.globalAlpha=p.life/p.maxLife*0.75;
+      ctx.fillStyle=p.col;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fill();
+      ctx.globalAlpha=1;
+      return p.life>0;
     });
 
     drawPlayer();
-
-    if (memoryBlur > 0) {
-      ctx.fillStyle = `rgba(180,150,200,${memoryBlur * 0.18})`;
-      ctx.fillRect(0, 0, W, H);
-      if (memoryBlur > 0.4) {
-        ctx.save();
-        ctx.globalAlpha = memoryBlur * 0.35;
-        ctx.font = `${12 + memoryBlur * 8}px serif`;
-        ctx.fillStyle = 'rgba(200,180,220,0.6)';
-        const glyphs = ['𓂀','𓃭','𓆣','𓇯','𓈖','𓉔','𓊃','𓋴'];
-        for (let i = 0; i < 6; i++) {
-          ctx.fillText(glyphs[Math.floor(Math.random() * glyphs.length)], Math.random() * W, Math.random() * H);
-        }
-        ctx.restore();
-      }
-    }
-
     ctx.restore();
-    raf = requestAnimationFrame(loop);
+    raf=requestAnimationFrame(loop);
   }
 
-  // Expose global pour le bouton dash
-  window.triggerDash = triggerDash;
-  // Démarrer via le bouton de l'overlay
   document.getElementById('start-btn').addEventListener('click', startGame);
 })();
 </script>

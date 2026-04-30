@@ -1013,7 +1013,12 @@
       "text": "À partir de maintenant, chaque choix que je ferai décidera de ma survie.",
       "pause": 1000,
       "music": "normal.mp3",
-      "next": "END"
+      "next": null,
+      "ending_result": {
+        "tag": "✦ Prologue terminé",
+        "title": "Bientôt…",
+        "description": "Les chapitres arrivent prochainement, avec vos intérêts amoureux :\n\n\nDazai · Akutagawa · Ranpo\nChuuya · Fyodor · Nikolai · Sigma \n\nNe cliquez pas encore sur menu principal, le site est encore en construction"
+      }
     }
   }
 }
